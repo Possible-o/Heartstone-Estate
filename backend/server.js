@@ -1860,7 +1860,8 @@ app.patch(
 
     if (
       typeof imageUrl !== "string" ||
-      !imageUrl.startsWith("/uploads/properties/")
+      (!getCloudinaryPublicId(imageUrl) &&
+        !imageUrl.startsWith("/uploads/properties/"))
     ) {
       return res.status(400).json({
         message: "A valid cover image URL is required.",
