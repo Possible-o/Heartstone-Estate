@@ -1,79 +1,53 @@
-Heartstone Estate
+# Heartstone Estate
 
-Heartstone Estate is a full-stack real estate website built around residential properties in Lagos, Nigeria. It allows visitors to explore available homes, view property details, create accounts, save properties, and request inspections.
+Heartstone Estate is a full-stack real estate website for residential properties in Lagos, Nigeria. Visitors can browse homes, view property details, create accounts, save favourites, and request inspections. There's also an admin dashboard for managing listings, property images, inspection requests, and enquiries.
 
-The project also includes an admin dashboard for managing property listings, uploaded images, inspection requests, and customer enquiries.
+The frontend uses HTML, CSS, and vanilla JavaScript. The backend runs on Node.js and Express, with MongoDB for data storage.
 
-I built the frontend with HTML, CSS, and vanilla JavaScript, while Node.js and Express handle the backend. MongoDB stores the application's data.
+## Tech Stack
 
-Tech Stack
+| Area | Technologies |
+| --- | --- |
+| Frontend | HTML, CSS, JavaScript |
+| Backend | Node.js, Express.js |
+| Database | MongoDB, Mongoose |
+| Authentication | bcryptjs, express-session, connect-mongo |
+| Security | Helmet, express-rate-limit |
+| Email | Nodemailer |
+| Image uploads | Multer, Sharp |
 
-Frontend: HTML, CSS, JavaScript
+## Features
 
-Backend: Node.js, Express.js
+### Property listings
 
-Database: MongoDB, Mongoose
+Visitors can browse properties, search for homes, and open listings to see their details. Admins can add, edit, and remove properties, and their changes are reflected on the website.
 
-Other tools: bcryptjs, express-session, connect-mongo, Helmet, Nodemailer, Multer, Sharp
+### User accounts
 
-Features
+Registered users can sign in, save favourite properties, and request inspections. Login sessions are managed by Express and stored in MongoDB.
 
-Property Listings
-
-Users can browse properties, search for available homes, and open individual listings to see more information.
-
-Property information is managed through the admin dashboard, so changes to listings are reflected on the website.
-
-User Accounts
-
-Users can register, sign in, manage their favourite properties, and request inspections.
-
-Authentication is handled on the server using Express sessions, with session data stored in MongoDB.
-
-Admin Dashboard
+### Admin dashboard
 
 Administrators can:
 
-Add, edit, and delete property listings.
+- Add, edit, and delete properties.
+- Upload multiple images for each listing.
+- Review inspection requests.
+- Manage customer enquiries.
 
-Upload multiple images for a property.
+Admin accounts are stored in a separate collection and created using a backend script, not a public signup page.
 
-View and manage inspection requests.
+### Password reset
 
-Manage customer enquiries.
+Users can request a password reset link by email. The backend stores a hash of the reset token, and each link expires after 15 minutes. Reset links are single-use, and resetting a password invalidates existing user sessions.
 
-Admin accounts are stored separately from regular user accounts. New administrators are created through a backend script rather than a public registration form.
+## Security
 
-Password Reset
+The backend includes password hashing with bcryptjs, server-side validation, role-based route protection, HTTP-only session cookies, session regeneration after login, rate limiting on sensitive endpoints, and security headers through Helmet. Credentials and other secrets are configured through environment variables.
 
-Users who forget their passwords can request a reset link by email.
+## Project Structure
 
-The backend generates a random token, stores its hash in MongoDB, and sends the reset link using Nodemailer. Each link expires after 15 minutes and can only be used once.
-
-Resetting a password also invalidates existing user sessions.
-
-Security
-
-A few measures I've implemented include:
-
-Password hashing with bcryptjs.
-
-Server-side input validation.
-
-Role-based access control for protected routes.
-
-HTTP-only session cookies.
-
-Session regeneration after login.
-
-Rate limiting on sensitive endpoints.
-
-Security headers using Helmet.
-
-Environment variables for database credentials and other secrets.
-
-Project Structure
-
+```text
 Heartstone_Estate/
 ├── backend/
 │   ├── models/
@@ -90,26 +64,23 @@ Heartstone_Estate/
 │   └── index.html
 ├── .gitignore
 └── README.md
+```
 
-The backend contains the Express server, database models, authentication logic, and API endpoints.
-
-The frontend contains the website pages, stylesheets, images, and JavaScript files.
-
-Running Locally
+## Running Locally
 
 You'll need Node.js 22.x, npm, and a MongoDB connection.
 
-Clone the repository:
+Clone the repository and install the backend dependencies:
 
-git clone https://github.com/Possible-o/Heartstone-Estate
-cd Heartstone_Estate/backend
-
-Install the dependencies:
-
+```bash
+git clone https://github.com/Possible-o/Heartstone-Estate.git
+cd Heartstone-Estate/backend
 npm install
+```
 
-Create a .env file in the backend directory and provide the required configuration:
+Create a `.env` file inside `backend/` and add your own configuration values:
 
+```env
 MONGODB_URI=
 SESSION_SECRET=
 SMTP_USER=
@@ -117,35 +88,36 @@ SMTP_APP_PASSWORD=
 APP_BASE_URL=http://localhost:3000
 PORT=3000
 NODE_ENV=development
+```
 
 Start the server:
 
+```bash
 npm start
+```
 
-The application should be available at:
+Open [http://localhost:3000](http://localhost:3000).
 
-http://localhost:3000
+The `.env` file is excluded from Git and should never be committed.
 
-The .env file is excluded from Git, so credentials aren't included in the repository.
+## Creating an Admin Account
 
-Creating an Admin Account
+From the `backend/` directory, run:
 
-Admin accounts are created from the backend terminal:
-
+```bash
 npm run create-admin
+```
 
-The script asks for an email address, full name, and password. It validates the information and saves the administrator to the separate admins collection.
+The script prompts for the administrator's name, email, and password, validates the details, and saves the account in the `admins` collection.
 
-Deployment
+## Deployment
 
-The application is currently being prepared for deployment on Render, with MongoDB Atlas handling database storage.
+The application is being prepared for deployment on Render, using MongoDB Atlas for the database.
 
-Property image uploads currently use local file storage. Persistent cloud storage will be needed to keep uploaded images available reliably after deployment.
+Property images are currently stored on the local filesystem. Persistent object or image storage will be needed to keep new uploads reliably available in production.
 
-About the Project
+## About the Project
 
-I worked on this project to put together a complete web application rather than just a static website.
+I built this to work through the parts of a full-stack application that go beyond the interface: connecting a frontend to real backend routes, managing user and admin access, storing sessions, working with MongoDB, and handling password recovery.
 
-The backend was a major part of the work, particularly connecting authentication to MongoDB, separating user and admin access, managing sessions, and implementing password recovery.
-
-The project is still being improved, with deployment and final testing underway.
+Deployment and production testing are the next steps.
