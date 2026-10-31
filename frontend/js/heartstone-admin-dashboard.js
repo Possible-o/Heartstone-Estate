@@ -226,13 +226,11 @@
 
       coverButton.textContent = isCover ? "Cover picture" : "Set as cover";
 
-      coverButton.disabled = isCover || image.isNew;
+      coverButton.disabled = isCover;
 
-      coverButton.title = image.isNew
-        ? "Save this picture before setting it as cover."
-        : isCover
-          ? "This is the current cover picture."
-          : "Make this the property's cover picture.";
+      coverButton.title = isCover
+        ? "This is the selected cover picture."
+        : "Make this the property's cover picture.";
 
       item.append(img, tag, remove, coverButton);
       list.appendChild(item);
@@ -368,7 +366,9 @@
         .map((feature) => feature.trim())
         .filter(Boolean),
       featured: $("#pFeatured").checked,
-      images: draftImages.map((image) => image.src),
+      images: draftImages
+        .filter((image) => !image.isNew)
+        .map((image) => image.src),
     };
   }
 
@@ -413,11 +413,46 @@
         .filter((image) => image.isNew && image.file)
         .map((image) => image.file);
 
+      const selectedCover = draftImages[0];
+
       if (newImages.length) {
         const propertyId = result.property.id;
 
         try {
-          await H.uploadPropertyImages(propertyId, newImages);
+          const uploadResult = await H.uploadPropertyImages(
+            propertyId,
+            newImages,
+          );
+
+          if (selectedCover?.isNew) {
+            const uploadedProperty = uploadResult.property;
+
+            if (!uploadedProperty?.images?.length) {
+              throw new Error("Unable to identify the uploaded cover picture.");
+            }
+
+            const uploadedImages = uploadedProperty.images;
+            const newImageEntries = draftImages.filter(
+              (image) => image.isNew && image.file,
+            );
+
+            const selectedCoverIndex = newImageEntries.indexOf(selectedCover);
+
+            if (selectedCoverIndex === -1) {
+              throw new Error("The selected cover picture was not found.");
+            }
+
+            const uploadedCover =
+              uploadedImages[
+                uploadedImages.length - newImages.length + selectedCoverIndex
+              ];
+
+            if (!uploadedCover) {
+              throw new Error("Unable to identify the selected cover picture.");
+            }
+
+            await H.setPropertyCover(propertyId, uploadedCover);
+          }
         } catch (uploadError) {
           render();
 
@@ -957,10 +992,17 @@
 
       const index = Number(button.dataset.coverImage);
       const image = draftImages[index];
+
+      if (!image || index === 0 || !adminStillValid()) return;
+
       const propertyId = $("#editId").value;
 
-      if (!image || image.isNew || !propertyId) return;
-      if (index === 0 || !adminStillValid()) return;
+      if (image.isNew || !propertyId) {
+        draftImages.splice(index, 1);
+        draftImages.unshift(image);
+        renderPreviews();
+        return;
+      }
 
       processing += 1;
       $("#propertySave").disabled = true;
@@ -1088,7 +1130,6 @@
   else init();
 })();
 
-
 (function () {
   "use strict";
 
@@ -1112,13 +1153,17 @@
   const dialog = $("#enquiryDialog");
 
   function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[char]);
+    return String(value ?? "").replace(
+      /[&<>"']/g,
+      (char) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char],
+    );
   }
 
   function formatDate(value) {
@@ -1133,7 +1178,7 @@
           month: "short",
           year: "numeric",
           hour: "2-digit",
-          minute: "2-digit"
+          minute: "2-digit",
         }).format(date);
   }
 
@@ -1143,8 +1188,8 @@
       ...options,
       headers: {
         "Content-Type": "application/json",
-        ...options.headers
-      }
+        ...options.headers,
+      },
     });
 
     const contentType = response.headers.get("content-type") || "";
@@ -1157,7 +1202,7 @@
 
     if (!response.ok) {
       throw new Error(
-        result.message || "Unable to complete the enquiry request."
+        result.message || "Unable to complete the enquiry request.",
       );
     }
 
@@ -1168,8 +1213,7 @@
     const query = $("#searchEnquiries").value.trim().toLowerCase();
 
     const visible = enquiries.filter((item) => {
-      const matchesStatus =
-        filter === "all" || item.status === filter;
+      const matchesStatus = filter === "all" || item.status === filter;
 
       const matchesSearch = [
         item.id,
@@ -1177,20 +1221,26 @@
         item.email,
         item.phone,
         item.interest,
-        item.message
+        item.message,
       ].some((value) =>
-        String(value || "").toLowerCase().includes(query)
+        String(value || "")
+          .toLowerCase()
+          .includes(query),
       );
 
       return matchesStatus && matchesSearch;
     });
 
-    table.innerHTML = visible.map((item) => {
-      const status = ["pending", "reviewed", "resolved"].includes(item.status)
-        ? item.status
-        : "pending";
+    table.innerHTML =
+      visible
+        .map((item) => {
+          const status = ["pending", "reviewed", "resolved"].includes(
+            item.status,
+          )
+            ? item.status
+            : "pending";
 
-      return `
+          return `
         <tr>
           <td>
             <strong>${escapeHTML(item.fullName)}</strong>
@@ -1215,7 +1265,8 @@
           </td>
         </tr>
       `;
-    }).join("") ||
+        })
+        .join("") ||
       '<tr><td colspan="5">No matching enquiries on this page.</td></tr>';
 
     $("#enquiriesPageInfo").textContent = total
@@ -1244,12 +1295,10 @@
 
     try {
       const result = await api(
-        `/api/admin/enquiries?page=${encodeURIComponent(requestedPage)}`
+        `/api/admin/enquiries?page=${encodeURIComponent(requestedPage)}`,
       );
 
-      enquiries = Array.isArray(result.enquiries)
-        ? result.enquiries
-        : [];
+      enquiries = Array.isArray(result.enquiries) ? result.enquiries : [];
 
       page = Number(result.page) || requestedPage;
       pages = Number(result.pages) || 0;
@@ -1257,8 +1306,7 @@
 
       message.textContent = "";
     } catch (error) {
-      message.textContent =
-        error.message || "Unable to load enquiries.";
+      message.textContent = error.message || "Unable to load enquiries.";
     } finally {
       loading = false;
       $("#refreshEnquiries").disabled = false;
@@ -1281,7 +1329,7 @@
       ["Message", item.message],
       ["Status", item.status],
       ["Submitted", formatDate(item.createdAt)],
-      ["Reference", item.id]
+      ["Reference", item.id],
     ];
 
     $("#enquiryDetails").replaceChildren();
@@ -1324,13 +1372,10 @@
     actionMessage.textContent = "Saving…";
 
     try {
-      await api(
-        `/api/admin/enquiries/${encodeURIComponent(id)}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ status })
-        }
-      );
+      await api(`/api/admin/enquiries/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
 
       const item = enquiries.find((entry) => entry.id === id);
       if (item) item.status = status;
@@ -1341,8 +1386,7 @@
 
       await loadEnquiries(page);
     } catch (error) {
-      actionMessage.textContent =
-        error.message || "Unable to update enquiry.";
+      actionMessage.textContent = error.message || "Unable to update enquiry.";
     } finally {
       saving = false;
 
@@ -1388,9 +1432,7 @@
     });
 
     table.addEventListener("click", (event) => {
-      const button = event.target.closest(
-        '[data-action="open-enquiry"]'
-      );
+      const button = event.target.closest('[data-action="open-enquiry"]');
 
       if (button) {
         openEnquiry(button.dataset.id);

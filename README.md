@@ -1,54 +1,91 @@
 # Heartstone Estate
 
-Heartstone Estate is a full-stack real estate website for residential properties in Lagos, Nigeria. Visitors can browse homes, view property details, create accounts, save favourites, and request inspections. There's also an admin dashboard for managing listings, property images, inspection requests, and enquiries.
+Heartstone Estate is a full-stack real estate web application designed for residential properties in Lagos, Nigeria. It provides a platform for browsing properties, managing user accounts, saving favourite listings, and requesting property inspections.
 
-The frontend uses HTML, CSS, and vanilla JavaScript. The backend runs on Node.js and Express, with MongoDB for data storage.
+The application also includes a protected administrative dashboard for managing properties, images, inspection requests, and customer enquiries.
 
-## Tech Stack
+**Live Website:** https://heartstone-estate.onrender.com
 
-| Area | Technologies |
-| --- | --- |
-| Frontend | HTML, CSS, JavaScript |
+## Technology Stack
+
+| Component | Technologies |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript |
 | Backend | Node.js, Express.js |
-| Database | MongoDB, Mongoose |
+| Database | MongoDB Atlas, Mongoose |
 | Authentication | bcryptjs, express-session, connect-mongo |
-| Security | Helmet, express-rate-limit |
+| Security | Helmet, express-rate-limit, server-side validation |
+| Image Management | Cloudinary, Multer, Sharp |
 | Email | Nodemailer |
-| Image uploads | Multer, Sharp |
+| Deployment | Render |
 
 ## Features
 
-### Property listings
+### Property Listings
 
-Visitors can browse properties, search for homes, and open listings to see their details. Admins can add, edit, and remove properties, and their changes are reflected on the website.
+- Browse residential properties available for sale or rent.
+- Search and explore property listings.
+- View property descriptions, prices, locations, features, and images.
+- Access property information across desktop, tablet, and mobile devices.
+- Display updates made by administrators.
 
-### User accounts
+### User Authentication
 
-Registered users can sign in, save favourite properties, and request inspections. Login sessions are managed by Express and stored in MongoDB.
+- User registration and login.
+- Secure password hashing using bcryptjs.
+- Session-based authentication.
+- Protected user dashboard.
+- Favourite property management.
+- Property inspection requests.
+- Password recovery through email.
 
-### Admin dashboard
+### Administrative Dashboard
 
-Administrators can:
+The administrative dashboard allows authorised administrators to:
 
-- Add, edit, and delete properties.
-- Upload multiple images for each listing.
-- Review inspection requests.
-- Manage customer enquiries.
+- Create, edit, and delete property listings.
+- Upload multiple property images.
+- Select and update a property's cover image.
+- Manage images stored in Cloudinary.
+- Mark properties as featured.
+- Review and manage inspection requests.
+- View and manage customer enquiries.
 
-Admin accounts are stored in a separate collection and created using a backend script, not a public signup page.
+Administrator accounts are created through a backend script and stored separately from regular user accounts. Public administrator registration is not available.
 
-### Password reset
+### Property Image Management
 
-Users can request a password reset link by email. The backend stores a hash of the reset token, and each link expires after 15 minutes. Reset links are single-use, and resetting a password invalidates existing user sessions.
+Property images are processed using Multer and Sharp before being uploaded to Cloudinary.
+
+The image management system supports multiple images per property, cover-image selection, and image removal. Property images are stored in Cloudinary rather than relying on the application's local filesystem.
+
+### Password Recovery
+
+Registered users can request password reset links through email.
+
+Reset tokens are securely hashed, expire after 15 minutes, and can only be used once. Successful password resets also invalidate existing user sessions.
 
 ## Security
 
-The backend includes password hashing with bcryptjs, server-side validation, role-based route protection, HTTP-only session cookies, session regeneration after login, rate limiting on sensitive endpoints, and security headers through Helmet. Credentials and other secrets are configured through environment variables.
+Heartstone Estate includes several security measures:
+
+- Password hashing using bcryptjs.
+- Server-side input validation.
+- Session-based authentication with HTTP-only cookies.
+- MongoDB-backed session storage.
+- Role-based access protection.
+- Separate administrator authentication.
+- Rate limiting on sensitive endpoints.
+- HTTP security headers using Helmet.
+- Protected administrative API routes.
+- Environment variables for sensitive configuration.
+
+Authentication and authorisation are enforced by the backend rather than relying solely on frontend restrictions.
 
 ## Project Structure
 
 ```text
-Heartstone_Estate/
+Heartstone-Estate/
 ├── backend/
 │   ├── models/
 │   ├── scripts/
@@ -66,23 +103,43 @@ Heartstone_Estate/
 └── README.md
 ```
 
-## Running Locally
+## Local Installation
 
-You'll need Node.js 22.x, npm, and a MongoDB connection.
+### Requirements
 
-Clone the repository and install the backend dependencies:
+- Node.js 22.x
+- npm
+- MongoDB connection
+- Cloudinary account
+- SMTP credentials for email functionality
+
+### Setup
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/Possible-o/Heartstone-Estate.git
-cd Heartstone-Estate/backend
+cd Heartstone-Estate
+```
+
+Install backend dependencies:
+
+```bash
+cd backend
 npm install
 ```
 
-Create a `.env` file inside `backend/` and add your own configuration values:
+Create a `.env` file inside the `backend` directory and configure the required environment variables.
+
+The application requires a MongoDB connection, a secure session secret, and Cloudinary configuration. Email credentials are required for password recovery.
+
+Example application settings:
 
 ```env
 MONGODB_URI=
 SESSION_SECRET=
+CLOUDINARY_URL=
+CLOUDINARY_CLOUD_NAME=
 SMTP_USER=
 SMTP_APP_PASSWORD=
 APP_BASE_URL=http://localhost:3000
@@ -90,34 +147,59 @@ PORT=3000
 NODE_ENV=development
 ```
 
-Start the server:
+Keep all credentials private. Never commit the `.env` file or actual secret values to GitHub.
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Or start normally:
 
 ```bash
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open:
 
-The `.env` file is excluded from Git and should never be committed.
+http://localhost:3000
 
-## Creating an Admin Account
+## Administrator Account Creation
 
-From the `backend/` directory, run:
+Administrator accounts are created through a dedicated backend script.
+
+From the `backend` directory, run:
 
 ```bash
 npm run create-admin
 ```
 
-The script prompts for the administrator's name, email, and password, validates the details, and saves the account in the `admins` collection.
+Follow the prompts to provide the administrator's required information.
+
+The account is stored in the separate administrator collection in MongoDB.
 
 ## Deployment
 
-The application is being prepared for deployment on Render, using MongoDB Atlas for the database.
+Heartstone Estate is deployed on Render with MongoDB Atlas providing database storage and Cloudinary providing persistent image hosting.
 
-Property images are currently stored on the local filesystem. Persistent object or image storage will be needed to keep new uploads reliably available in production.
+The deployment uses environment variables for database connectivity, session security, Cloudinary integration, and email configuration.
 
-## About the Project
+**Production URL:** https://heartstone-estate.onrender.com
 
-I built this to work through the parts of a full-stack application that go beyond the interface: connecting a frontend to real backend routes, managing user and admin access, storing sessions, working with MongoDB, and handling password recovery.
+## Project Objectives
 
-Deployment and production testing are the next steps.
+Heartstone Estate was developed to demonstrate the design and implementation of a complete real estate web application, including:
+
+- Responsive frontend development.
+- RESTful backend API integration.
+- Database design and management.
+- Secure user and administrator authentication.
+- Property and image management.
+- Inspection request workflows.
+- Email-based password recovery.
+- Cloud deployment and persistent data storage.
+
+## Project Status
+
+The application has been deployed and includes its core property management, authentication, inspection request, enquiry management, and Cloudinary image-management functionality.
