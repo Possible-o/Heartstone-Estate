@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Heartstone Lagos | Homes for sale and to rent in Lagos</title>
+    <link rel= "preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/heartstone-homepage.css">
+    <link rel="stylesheet" href="css/heartstone-shared.css">
+</head>
+
+<body>
+    <header class="office-strip">
+        <div class="office-info">LAGOS RESIDENTIAL / NIGERIA</div>
+        <div class="office-info">+234 809 000 0000</div>
+    </header>
+
+    <div class="nav">
+        <div class="logo">
+            <p class="brand">HEARTSTONE</p>
+            <p class="office">LAGOS</p>
+        </div>
+
+        <div class="navlinks">
+            <a href="#home-for-sale">Buy</a>
+            <a href="#homes-for-rent">Rent</a>
+            <a href="about-contact.html#services">Sell & let</a>
+            <a href="about-contact.html#about-contact">About & contact</a>
+            <a href="signin.html">Sign in</a>
+        </div>
+    </div>
+
+    <section class="hero">
+
+        <div class="hero-content">
+            <p class="eyebrow">LAGOS & NIGERIA'S COASTAL CITY</p>
+
+            <h1>A different perspective on Lagos.</h1>
+
+            <p class="hero-description">
+                Contemporary living. Coastal character. Discover a home
+                in a city where culture, energy and opportunity meet.
+            </p>
+        </div>
+
+        <div class="hero-image">
+            <img src="images/homepage.png" alt="Contemporary residential buildings in Lagos">
+        </div>
+    </section>
+
+    <section class="search">
+        <div class="search-tabs">
+            <button class="tab active" type="button" data-mode="buy">Buy a home</button>
+            <button class="tab" type="button" data-mode="rent">Rent a home</button>
+        </div>
+
+        <form class="search-form" id="searchForm">
+
+            <div class="field field-location">
+                <label for="searchText">LOCATION OR PROPERTY NAME</label>
+                <input type="text" id="searchText" name="q" maxlength="80" placeholder="Lagos & surrounding areas">
+            </div>
+
+            <div class="field">
+                <label for="searchKind">PROPERTY TYPE</label>
+                <select id="searchKind" name="kind">
+                    <option value="">Any</option>
+                    <option value="Apartment">Apartment</option>
+                    <option value="House">House</option>
+                    <option value="Penthouse">Penthouse</option>
+                    <option value="Duplex">Duplex</option>
+                    <option value="Terrace">Terrace</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label id="priceLabel" for="priceRange">PRICE RANGE</label>
+                <select id="priceRange" name="price">
+                    <option value="any">Any</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="searchBeds">BEDROOMS</label>
+                <select id="searchBeds" name="beds">
+                    <option value="">Any</option>
+                    <option value="1">1+</option>
+                    <option value="2">2+</option>
+                    <option value="3">3+</option>
+                    <option value="4">4+</option>
+                </select>
+            </div>
+
+            <button type="submit" class="search-button">Find a property <span>→</span></button>
+        </form>
+    </section>
+
+
+    <section class="local-knowledge">
+
+        <div class="local-knowledge-left">
+
+            <p class="section-eyebrow">
+                LAGOS RESIDENTIAL
+            </p>
+
+            <h2>
+                Local knowledge.<br>
+                A considered<br>
+                approach.
+            </h2>
+
+        </div>
+
+        <div class="local-knowledge-right">
+            <p>
+                From the established streets of Ikoyi and Victoria Island
+                to the growing communities of Lekki, our Lagos team brings
+                together homes for sale and to rent across some of the city's
+                most sought-after neighbourhoods.
+            </p>
+
+            <a href="about-contact.html#about-contact" class="local-knowledge-link">
+                Meet the Lagos office <span>→</span>
+            </a>
+        </div>
+    </section>
+
+
+    <section class="featured-properties" id="home-for-sale">
+
+        <div class="featured-properties-header">
+
+            <div>
+                <p class="section-eyebrow">
+                    A CLOSER LOOK
+                </p>
+
+                <h2>
+                    Homes with a sense of place.
+                </h2>
+            </div>
+
+            <a href="properties.html?mode=sale" class="view-all-link">
+                View all homes for sale <span>→</span>
+            </a>
+
+        </div>
+
+
+        <div class="property-grid" id="featuredSale" aria-live="polite"></div>
+        <noscript>
+            <p class="featured-empty">Turn on JavaScript to see featured homes, or <a href="properties.html">browse all
+                    homes</a>.</p>
+        </noscript>
+    </section>
+
+    <section class="neighbourhood-history" id="neighbourhood">
+
+        <div class="history-image">
+            <img src="images/lekki-residence.png" alt="Waterfront residential buildings in Lagos">
+        </div>
+        <div class="history-content">
+            <p class="history-eyebrow">
+                THE NEIGHBOURHOOD
+            </p>
+
+            <h2>
+                Lagos living,<br>
+                by the water's edge.
+            </h2>
+
+            <p class="history-description">
+                Lagos is a city shaped by its relationship with the coast.
+                From the established communities of Ikoyi and Victoria Island
+                to the growing neighbourhoods of Lekki, the city offers a
+                distinctive mix of contemporary homes, culture and urban energy.
+            </p>
+        </div>
+    </section>
+
+    <section class="move-personal">
+        <p class="move-personal__eyebrow">A MOVE, MADE PERSONAL</p>
+
+        <div class="move-personal__grid">
+
+            <article class="move-personal__card">
+                <h2>Buying &amp; renting</h2>
+
+                <p>
+                    Find a home that fits the way you want to live.
+                    Browse Lagos and the surrounding neighbourhoods.
+                </p>
+
+                <a href="properties.html" class="move-personal__link">
+                    Explore the collection <span aria-hidden="true">↗</span>
+                </a>
+            </article>
+
+            <article class="move-personal__card">
+                <h2>Selling &amp; letting</h2>
+
+                <p>
+                    From your first conversation to your next move,
+                    discuss a considered approach for your property.
+                </p>
+
+                <a href="about-contact.html#enquiry" class="move-personal__link">
+                    Speak to our office <span aria-hidden="true">↗</span>
+                </a>
+            </article>
+
+            <article class="move-personal__card">
+                <h2>Property valuation</h2>
+
+                <p>
+                    Thinking about what comes next? Start with a
+                    conversation about your home and your plans.
+                </p>
+
+                <a href="about-contact.html?interest=Property%20valuation#enquiry" class="move-personal__link">
+                    Request a valuation <span aria-hidden="true">↗</span>
+                </a>
+            </article>
+        </div>
+    </section>
+
+
+    <section class="rental-homes" id="homes-for-rent">
+        <div class="rental-homes__header">
+            <div class="rental-homes__heading">
+                <p class="rental-homes__eyebrow">
+                    ROOM FOR YOUR NEXT CHAPTER
+                </p>
+
+                <h2>A place to make your own.</h2>
+            </div>
+
+            <a href="properties.html?mode=rent" class="rental-homes__view-all">
+                View all homes for rent <span aria-hidden="true">→</span>
+            </a>
+        </div>
+
+        <div class="rental-homes__grid" id="featuredRent" aria-live="polite"></div>
+        <noscript>
+            <p class="featured-empty">Turn on JavaScript to see featured homes, or <a
+                    href="properties.html?mode=rent">browse all rentals</a>.</p>
+        </noscript>
+    </section>
+
+    <section class="next-step">
+
+        <div class="next-step__header">
+            <p class="next-step__eyebrow">
+                FIND YOUR RIGHT HOME
+            </p>
+
+            <h2>Take the next step, at your pace.</h2>
+        </div>
+
+        <div class="next-step__steps">
+
+            <article class="next-step__item">
+                <span class="next-step__number">01</span>
+
+                <div class="next-step__content">
+                    <h3>Find your shortlist</h3>
+
+                    <p>
+                        Search by area, budget and property type.
+                        Save the homes you want to return to.
+                    </p>
+                </div>
+            </article>
+
+
+            <article class="next-step__item">
+                <span class="next-step__number">02</span>
+
+                <div class="next-step__content">
+                    <h3>Request an inspection</h3>
+
+                    <p>
+                        Get in touch to arrange a viewing at a
+                        time that works for you.
+                    </p>
+                </div>
+            </article>
+
+
+            <article class="next-step__item">
+                <span class="next-step__number">03</span>
+
+                <div class="next-step__content">
+                    <h3>Agree a time with the agent</h3>
+
+                    <p>
+                        Track your request in your account.
+                        The office will respond as soon as possible.
+                    </p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="clarity-section">
+
+        <div class="clarity-section__intro">
+            <p class="clarity-section__eyebrow">
+                GOOD TO KNOW
+            </p>
+
+            <h2>
+                A little clarity,<br>
+                before you move.
+            </h2>
+
+            <a href="about-contact.html#enquiry" class="clarity-section__link">
+                Ask the Lagos office
+            </a>
+        </div>
+
+
+        <div class="clarity-section__faqs">
+
+            <article class="clarity-faq">
+                <h3>Do I need an agent to become a homeowner?</h3>
+
+                <p>
+                    No. Search and property details are public. Sign in to save
+                    homes and submit or manage your personal inspection requests.
+                </p>
+            </article>
+
+            <article class="clarity-faq">
+                <h3>Is an inspection request a confirmed viewing?</h3>
+
+                <p>
+                    No. Your preferred date is a request. The agent must confirm
+                    the property's availability and agree an appointment with you.
+                </p>
+            </article>
+
+            <article class="clarity-faq">
+                <h3>How are rental prices shown?</h3>
+
+                <p>
+                    Each home lists its rental price and payment period.
+                    Contact the letting team for availability, tenancy terms
+                    and any additional costs.
+                </p>
+            </article>
+
+            <article class="clarity-faq">
+                <h3>Can the office help me sell or let?</h3>
+
+                <p>
+                    Yes. Our Lagos team offers sales, letting and valuation
+                    services. Contact the team to discuss your property.
+                </p>
+            </article>
+        </div>
+    </section>
+
+
+    <footer class="heartstone-footer">
+
+        <div class="heartstone-footer__main">
+            <div class="heartstone-footer__brand">
+
+                <h2>
+                    A local address.
+                    A wider <br> perspective.
+                </h2>
+
+                <p class="heartstone-footer__description">
+                    12 Admiralty Way, Lekki Phase 1, Lagos State, Nigeria.
+                </p>
+
+                <a href="tel:+2348000000000" class="heartstone-footer__phone">
+                    +234 800 000 0000
+                </a>
+
+            </div>
+
+            <div class="heartstone-footer__navigation">
+
+                <div class="heartstone-footer__column">
+
+                    <p class="heartstone-footer__heading">
+                        EXPLORE
+                    </p>
+
+                    <a href="properties.html?mode=sale">
+                        Properties for sale
+                    </a>
+
+                    <a href="properties.html?mode=rent">
+                        Properties to rent
+                    </a>
+
+                    <a href="user-dashboard.html#saved">
+                        Saved properties
+                    </a>
+
+                </div>
+
+                <div class="heartstone-footer__column">
+
+                    <p class="heartstone-footer__heading">
+                        SERVICES
+                    </p>
+
+                    <a href="about-contact.html#services">
+                        Selling & letting
+                    </a>
+
+                    <a href="about-contact.html?interest=Property%20valuation#enquiry">
+                        Property valuation
+                    </a>
+
+                    <a href="about-contact.html#enquiry">
+                        About & contact
+                    </a>
+                </div>
+
+
+                <div class="heartstone-footer__column">
+
+                    <p class="heartstone-footer__heading">
+                        HEARTSTONE LAGOS
+                    </p>
+
+                    <a href="about-contact.html#services">
+                        Selling & letting
+                    </a>
+
+                    <a href="about-contact.html?interest=Property%20valuation#enquiry">
+                        Request a valuation
+                    </a>
+
+                    <a href="about-contact.html#enquiry">
+                        About & contact
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="heartstone-footer__bottom">
+
+            <p>
+                © 2026 Heartstone Lagos. All rights reserved.
+            </p>
+
+            <p>
+                Real estate in Lagos, Nigeria.
+            </p>
+
+        </div>
+    </footer>
+
+    <script src="js/heartstone-data.js"></script>
+    <script src="js/heartstone-interface.js"></script>
+    <script src="js/heartstone-property-cards.js"></script>
+    <script src="js/heartstone-homepage.js"></script>
+</body>
+
+</html>

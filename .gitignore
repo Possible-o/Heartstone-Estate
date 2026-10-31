@@ -1,0 +1,17 @@
+node_modules/
+**/node_modules/
+
+.env
+**/.env
+.env.*
+**/.env.*
+
+!.env.example
+!**/.env.example
+
+backend/uploads/
+*.log
+
+.DS_Store
+Thumbs.db
+.vscode/

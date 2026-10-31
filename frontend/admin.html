@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" data-protected="admin">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Heartstone Lagos | Office administration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/heartstone-admin.css">
+    <link rel="stylesheet" href="css/heartstone-shared.css">
+    <script src="js/heartstone-data.js"></script>
+</head>
+
+<body>
+    <header class="masthead"><a class="brand"
+            href="admin.html"><span>HEARTSTONE</span><small>LAGOS</small></a><i></i><span class="admin-label">OFFICE
+            ADMIN</span>
+        <div class="masthead-right"><a href="index.html" target="_blank" rel="noopener">View property website
+                ↗</a><i></i><span id="adminName">Lagos team / Administrator</span></div><button class="mobile-menu" id="mobileMenu" type="button"
+            aria-expanded="false" aria-controls="nav">Menu</button>
+    </header>
+    <nav class="nav" id="nav">
+        <div class="nav-tabs"><button class="nav-tab active" data-view="overview">Overview</button><button
+                class="nav-tab" data-view="properties">Properties <b id="navProperties">6</b></button><button
+                class="nav-tab" data-view="inspections">Inspection requests <b id="navRequests">3</b></button><button class="nav-tab" data-view="enquiries">Enquiries <b id="navEnquiries">0</b></button></div>
+        <button class="signout" id="signout" type="button">Sign out</button>
+    </nav>
+    <main class="shell">
+        <section class="view active" id="view-overview">
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">OFFICE ADMIN / OVERVIEW</p>
+                    <h1>Your Lagos overview.</h1>
+                    <p class="subtitle">Manage your property collection and help people take their next step.</p>
+                </div><time id="today"></time>
+            </div>
+            <div class="stats">
+                <article><strong id="total">6</strong><span>Listed properties</span><small id="breakdown">3 for sale · 3
+                        to rent</small></article>
+                <article><strong id="pendingCount">1</strong><span>Pending request</span><small>Awaiting agent
+                        confirmation</small></article>
+                <article><strong id="confirmedCount">1</strong><span>Confirmed inspection</span><small>Agreed
+                        appointment</small></article>
+                <article><strong id="cancelledCount">1</strong><span>Cancelled request</span><small>Retained in request
+                        history</small></article>
+            </div>
+            <section class="section">
+                <div class="section-head">
+                    <div>
+                        <h2>Inspection requests.</h2>
+                        <p class="subtitle">Review requests and agree a suitable appointment with the customer.</p>
+                    </div><button class="link" data-go="inspections">Manage all requests →</button>
+                </div>
+                <div class="notice"><strong id="noticeTitle">1 request needs your attention</strong><span
+                        id="noticeText">Check availability and agree a date and time before confirming.</span></div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>PROPERTY / REFERENCE</th>
+                                <th>REQUESTER</th>
+                                <th>INSPECTION DATE</th>
+                                <th>STATUS</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overviewRequests"></tbody>
+                    </table>
+                </div>
+                
+            </section>
+            <section class="section">
+                <div class="section-head">
+                    <div>
+                        <h2>Your property collection.</h2>
+                        <p class="subtitle">Keep particulars, advertised prices and availability up to date.</p>
+                    </div><button class="primary" id="addOne">Add a property →</button>
+                </div>
+                <div class="toolbar">
+                    <div class="filters"><button class="property-filter active" data-filter="all">All properties (<span
+                                id="countAll">6</span>)</button><button class="property-filter" data-filter="sale">For
+                            sale (<span id="countSale">3</span>)</button><button class="property-filter"
+                            data-filter="rent">To rent (<span id="countRent">3</span>)</button></div><label
+                        class="search">⌕ <input id="searchOverview" type="search"
+                            placeholder="Search property name or location"></label>
+                </div>
+                <div class="property-grid" id="overviewProperties"></div>
+                <div class="collection-foot"><span id="resultSummary">Showing 4 properties.</span><button class="link"
+                        data-go="properties">Manage all properties →</button></div>
+            </section>
+        </section>
+        <section class="view" id="view-properties" hidden>
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">OFFICE ADMIN / PROPERTIES</p>
+                    <h1>Your property collection.</h1>
+                    <p class="subtitle">Manage the homes shown across your Heartstone Lagos website.</p>
+                </div><button class="primary" id="addAll">Add a property →</button>
+            </div>
+            <div class="toolbar">
+                <div class="filters"><button class="property-filter active" data-filter="all">All properties (<span
+                            id="countAll2">6</span>)</button><button class="property-filter" data-filter="sale">For sale
+                        (<span id="countSale2">3</span>)</button><button class="property-filter" data-filter="rent">To
+                        rent (<span id="countRent2">3</span>)</button></div><label class="search">⌕ <input
+                        id="searchAll" type="search" placeholder="Search property name or location"></label>
+            </div>
+            <div class="property-grid" id="allProperties"></div>
+            <p class="demo-note">Property changes are securely saved and automatically reflected across Heartstone Estate.</p>
+        </section>
+        <section class="view" id="view-inspections" hidden>
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">OFFICE ADMIN / INSPECTIONS</p>
+                    <h1>Inspection requests.</h1>
+                    <p class="subtitle">Check availability, contact the requester and record the agreed appointment.</p>
+                </div>
+            </div>
+            <div class="toolbar">
+                <div class="filters"><button class="request-filter active" data-status="all">All
+                        requests</button><button class="request-filter" data-status="pending">Pending</button><button
+                        class="request-filter" data-status="confirmed">Confirmed</button><button class="request-filter"
+                        data-status="cancelled">Cancelled</button></div><label class="search">⌕ <input
+                        id="searchRequests" type="search" placeholder="Search name, property or reference"></label>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PROPERTY / REFERENCE</th>
+                            <th>REQUESTER</th>
+                            <th>PREFERRED DATE</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allRequests"></tbody>
+                </table>
+                <p class="empty" id="emptyRequests" hidden>No requests found. Try another filter or search.</p>
+            </div>
+            
+        </section>
+        <section class="view" id="view-enquiries" hidden>
+            <div class="page-heading"><div>
+                <p class="eyebrow">OFFICE ADMIN / ENQUIRIES</p>
+                <h1>Customer enquiries.</h1>
+                <p class="subtitle">Review messages received through the About & Contact page.</p>
+            </div></div>
+            <div class="toolbar">
+                <div class="filters">
+                    <button type="button" class="enquiry-filter active" data-enquiry-status="all">All</button>
+                    <button type="button" class="enquiry-filter" data-enquiry-status="pending">Pending</button>
+                    <button type="button" class="enquiry-filter" data-enquiry-status="reviewed">Reviewed</button>
+                    <button type="button" class="enquiry-filter" data-enquiry-status="resolved">Resolved</button>
+                </div>
+                <label class="search">⌕ <input id="searchEnquiries" type="search" placeholder="Search enquiries on this page"></label>
+            </div>
+            <p class="form-message" id="enquiriesMessage" role="status" aria-live="polite"></p>
+            <div class="table-scroll"><table>
+                <thead><tr><th>SENDER</th><th>INTEREST</th><th>RECEIVED</th><th>STATUS</th><th>ACTION</th></tr></thead>
+                <tbody id="allEnquiries"></tbody>
+            </table></div>
+            <div class="collection-foot">
+                <span id="enquiriesPageInfo">No enquiries loaded.</span>
+                <div><button type="button" class="secondary" id="enquiriesPrevious">Previous</button>
+                <button type="button" class="secondary" id="enquiriesNext">Next</button>
+                <button type="button" class="link" id="refreshEnquiries">Refresh</button></div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer"><span>Heartstone Lagos / Office administration</span><span>Heartstone Estate · Secure Property Management System</span></footer>
+
+    <dialog id="enquiryDialog">
+        <div class="dialog-card">
+            <div class="dialog-head"><div><p class="eyebrow">CUSTOMER ENQUIRY</p><h2>Review enquiry.</h2></div>
+                <button type="button" class="close" data-close aria-label="Close">×</button>
+            </div>
+            <div class="request-details" id="enquiryDetails"></div>
+            <p class="form-message" id="enquiryActionMessage" role="status" aria-live="polite"></p>
+            <div class="dialog-actions spread">
+                <button type="button" class="secondary" data-close>Close</button>
+                <div><button type="button" class="secondary" id="markEnquiryReviewed">Mark reviewed</button>
+                <button type="button" class="primary" id="markEnquiryResolved">Mark resolved</button></div>
+            </div>
+        </div>
+    </dialog>
+    <dialog id="propertyDialog">
+        <form id="propertyForm" class="dialog-card">
+            <div class="dialog-head">
+                <div>
+                    <p class="eyebrow">PROPERTY COLLECTION</p>
+                    <h2 id="propertyDialogTitle">Add a property.</h2>
+                </div><button type="button" class="close" data-close>×</button>
+            </div><input type="hidden" id="editId">
+            <div class="form-grid">
+                <label class="wide">Property name<input id="pName" required maxlength="90"></label><label>Listing
+                    type<select id="pType">
+                        <option value="sale">For sale</option>
+                        <option value="rent">To rent</option>
+                    </select></label><label>Availability<select id="pAvailability">
+                        <option value="available">Available</option>
+                        <option value="under-offer">Under offer</option>
+                        <option value="let-agreed">Let agreed</option>
+                    </select></label><label>Price (₦)<input id="pPrice" type="number" min="1"
+                        required></label><label>Location<input id="pLocation" required></label><label>Property
+                    type<select id="pKind">
+                        <option>Apartment</option>
+                        <option>House</option>
+                        <option>Penthouse</option>
+                        <option>Duplex</option>
+                        <option>Terrace</option>
+                    </select></label><label>Bedrooms<input id="pBeds" type="number" min="0" required
+                        value="2"></label><label>Bathrooms<input id="pBaths" type="number" min="0" required
+                        value="2"></label><label>Area (sqm)<input id="pArea" type="number" min="1"
+                        required></label><label id="periodField">Price period
+                    <select id="pPeriod">
+                        <option value="year">Per year</option>
+                        <option value="month">Per month</option>
+                    </select></label><label class="wide">Short description<textarea
+                        id="pDescription" rows="3" maxlength="240"></textarea></label><label class="wide">Features
+                    (one per line)<textarea id="pFeatures" rows="3"></textarea></label>
+                <div class="wide image-field">
+                    <label for="pImages">Pictures</label>
+                    <input id="pImages" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+                    <p class="helper">JPEG, PNG or WebP, up to 8 pictures. The first picture is the cover. Pictures are uploaded securely and saved to the property listing.</p>
+                    <ul class="image-previews" id="imagePreviews" aria-label="Property pictures"></ul>
+                </div>
+                <label class="wide check"><input id="pFeatured" type="checkbox"> Feature this property on the homepage</label>
+            </div>
+            <p class="form-message" id="propertyMessage" role="status"></p>
+            <div class="dialog-actions"><button type="button" class="secondary" data-close>Cancel</button><button
+                    class="primary" type="submit" id="propertySave">Save property →</button></div>
+        </form>
+    </dialog>
+
+    <dialog id="requestDialog">
+        <form id="requestForm" class="dialog-card">
+            <div class="dialog-head">
+                <div>
+                    <p class="eyebrow">INSPECTION REQUEST</p>
+                    <h2>Review request.</h2>
+                </div><button type="button" class="close" data-close>×</button>
+            </div><input type="hidden" id="requestId">
+            <div class="request-details" id="requestDetails"></div>
+            <div class="form-grid"><label>Agreed date<input id="agreedDate" type="date"></label><label>Agreed time<input
+                        id="agreedTime" type="time"></label><label class="wide">Agent note<textarea id="agentNote"
+                        rows="3" maxlength="300" placeholder="Appointment details or internal note"></textarea></label>
+            </div>
+            <p class="helper">Only confirm after the agent and requester have agreed on availability, date and time.</p>
+            <p class="form-message" id="requestMessage" role="status"></p>
+            <div class="dialog-actions spread"><button type="button" class="secondary" data-close>Close</button>
+                <div><button type="button" class="secondary danger" id="cancelRequest">Cancel request</button> <button
+                        type="button" class="primary" id="confirmRequest">Confirm appointment →</button></div>
+            </div>
+        </form>
+    </dialog>
+    <dialog id="previewDialog">
+        <div class="dialog-card">
+            <div class="dialog-head">
+                <div>
+                    <p class="eyebrow">PUBLIC LISTING PREVIEW</p>
+                    <h2 id="previewTitle">Property preview.</h2>
+                </div><button type="button" class="close" data-close>×</button>
+            </div>
+            <div id="previewBody"></div>
+            <div class="dialog-actions"><button type="button" class="secondary" data-close>Close preview</button></div>
+        </div>
+    </dialog>
+    <dialog id="signoutDialog">
+        <div class="dialog-card">
+            <div class="dialog-head">
+                <div>
+                    <p class="eyebrow">OFFICE ADMIN</p>
+                    <h2>Sign out?</h2>
+                </div><button type="button" class="close" data-close>×</button>
+            </div>
+            <p class="helper">Are you sure you want to sign out?.</p>
+            <div class="dialog-actions"><button type="button" class="secondary" data-close>Stay here</button><button
+                    type="button" class="primary" id="signoutContinue">Sign out →</button></div>
+        </div>
+    </dialog>
+    <script src="js/heartstone-interface.js"></script>
+    <script src="js/heartstone-admin-dashboard.js"></script>
+</body>
+
+</html>

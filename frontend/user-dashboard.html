@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-protected="user">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f4ef">
+  <title>My Account | Heartstone Lagos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/heartstone-user-dashboard.css">
+  <link rel="stylesheet" href="css/heartstone-shared.css">
+  <script src="js/heartstone-data.js"></script>
+</head>
+
+<body>
+  <nav class="site-nav" aria-label="Main navigation">
+    <a class="brand-lockup" href="index.html" aria-label="Heartstone Lagos home">
+      <span class="brand-lockup__name">HEARTSTONE</span>
+      <span class="brand-lockup__office">LAGOS</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html#home-for-sale">Buy</a>
+      <a href="index.html#homes-for-rent">Rent</a>
+      <a href="about-contact.html#services">Sell &amp; let</a>
+      <a href="index.html#neighbourhood">Our neighbourhood</a>
+      <a href="about-contact.html#about-contact">About &amp; contact</a>
+      <span class="nav-divider" aria-hidden="true"></span>
+      <a class="account-link" href="#overview">My account</a>
+    </div>
+  </nav>
+
+  <main class="dashboard-shell">
+    <nav class="account-nav" aria-label="Account sections" role="tablist">
+      <button class="account-tab is-active" type="button" role="tab" aria-selected="true"
+        data-panel="overview">Overview</button>
+      <button class="account-tab" type="button" role="tab" aria-selected="false" data-panel="saved">Saved homes <span
+          class="tab-count" id="savedTabCount">3</span></button>
+      <button class="account-tab" type="button" role="tab" aria-selected="false" data-panel="inspections">Inspection
+        requests <span class="tab-count" id="requestTabCount">3</span></button>
+      <button class="account-tab" type="button" role="tab" aria-selected="false" data-panel="enquiries">
+        My enquiries <span class="tab-count" id="enquiryTabCount">0</span>
+      </button>
+      <button class="account-tab" type="button" role="tab" aria-selected="false" data-panel="profile">My
+        profile</button>
+      <a class="sign-out" href="signin.html">Sign out</a>
+    </nav>
+
+    <section class="account-panel is-visible" id="overview" role="tabpanel">
+      <div class="welcome-row">
+        <div>
+          <p class="eyebrow">MY ACCOUNT / OVERVIEW</p>
+          <h1>Welcome home<span id="welcomeName">.</span></h1>
+          <p class="welcome-copy">Your saved homes, inspection plans and next steps in Lagos.</p>
+        </div>
+        <a class="text-link continue-link" href="properties.html">Continue browsing properties <span
+            aria-hidden="true">→</span></a>
+      </div>
+
+      <div class="account-stats" aria-label="Account summary">
+        <button class="stat" type="button" data-go="saved">
+          <span class="stat__number" id="savedStat">3</span>
+          <span class="stat__label">Saved homes</span>
+        </button>
+        <button class="stat" type="button" data-go="inspections" data-status="Pending">
+          <span class="stat__number" id="pendingStat">1</span>
+          <span class="stat__label">Pending requests</span>
+        </button>
+        <button class="stat" type="button" data-go="inspections" data-status="Confirmed">
+          <span class="stat__number" id="confirmedStat">1</span>
+          <span class="stat__label">Confirmed inspections</span>
+        </button>
+        <button class="stat" type="button" data-go="inspections" data-status="Cancelled">
+          <span class="stat__number" id="cancelledStat">1</span>
+          <span class="stat__label">Cancelled requests</span>
+        </button>
+      </div>
+
+      <section class="dashboard-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">YOUR SHORTLIST</p>
+            <h2>Your saved homes.</h2>
+          </div>
+          <button class="text-link" type="button" data-go="saved">View saved homes (<span
+              id="savedHeadingCount">3</span>) <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="property-grid" id="overviewSavedGrid"></div>
+        <p class="empty-state" id="overviewSavedEmpty" hidden>You have no saved homes yet. Browse the collection and
+          save properties to revisit them here.</p>
+      </section>
+
+      <section class="dashboard-section inspection-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">YOUR NEXT STEP</p>
+            <h2>Your inspection requests.</h2>
+          </div>
+          <button class="text-link" type="button" data-go="inspections">View all requests (<span
+              id="requestHeadingCount">3</span>) <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="notice" id="pendingNotice">
+          <strong id="pendingNoticeTitle">Your request is awaiting agent confirmation.</strong>
+          <p id="pendingNoticeText">Your preferred date is a request, not a confirmed appointment. The Heartstone team
+            will contact you to agree a viewing time.</p>
+        </div>
+        <div class="request-list request-list--compact" id="overviewRequestList"></div>
+      </section>
+
+      <section class="profile-summary">
+        <div>
+          <p class="eyebrow">YOUR DETAILS</p>
+          <h2 id="summaryName">Your profile</h2>
+          <p class="profile-summary__details" id="summaryContact">Update your contact details so our team can respond to
+            your requests.</p>
+        </div>
+        <button class="text-link" type="button" data-go="profile">Edit my profile <span
+            aria-hidden="true">→</span></button>
+      </section>
+    </section>
+
+    <section class="account-panel" id="saved" role="tabpanel" hidden>
+      <div class="page-heading">
+        <p class="eyebrow">MY ACCOUNT / SAVED HOMES</p>
+        <h1>Your shortlist.</h1>
+        <p>Keep the homes you are considering together in one place.</p>
+      </div>
+      <div class="property-grid property-grid--saved" id="savedPageGrid"></div>
+      <p class="empty-state" id="savedPageEmpty" hidden>You have not saved any homes yet. <a
+          href="properties.html?mode=sale">Explore homes for sale</a> or <a href="properties.html?mode=rent">browse
+          rentals</a>.</p>
+    </section>
+
+    <section class="account-panel" id="inspections" role="tabpanel" hidden>
+      <div class="page-heading">
+        <p class="eyebrow">MY ACCOUNT / INSPECTION REQUESTS</p>
+        <h1>Your inspection plans.</h1>
+        <p>Review each request and check whether the office has confirmed an appointment.</p>
+      </div>
+      <div class="request-tools">
+        <label for="requestFilter">Show requests</label>
+        <select id="requestFilter">
+          <option value="All">All requests</option>
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="notice notice--wide">
+        <strong>Please note</strong>
+        <p>A preferred date is not a confirmed viewing. An appointment is confirmed only after the agent agrees the date
+          and time with you.</p>
+      </div>
+      <div class="request-list" id="allRequestList"></div>
+      <p class="empty-state" id="requestEmpty" hidden>No inspection requests match this filter.</p>
+    </section>
+
+    <section class="account-panel" id="enquiries" role="tabpanel" hidden>
+      <div class="page-heading">
+        <p class="eyebrow">MY ACCOUNT / ENQUIRIES</p>
+        <h1>Your enquiries.</h1>
+        <p>View the enquiries you have sent to the Heartstone Lagos team and track their progress.</p>
+      </div>
+
+      <div class="request-tools">
+        <label for="enquiryFilter">Show enquiries</label>
+        <select id="enquiryFilter">
+          <option value="all">All enquiries</option>
+          <option value="pending">Pending</option>
+          <option value="reviewed">Reviewed</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+
+      <div class="request-list" id="enquiryList"></div>
+
+      <p class="empty-state" id="enquiryEmpty" hidden>
+        You haven't submitted any enquiries yet.
+      </p>
+
+      <a class="text-link" href="about-contact.html#contactForm">
+        Send a new enquiry <span aria-hidden="true">→</span>
+      </a>
+    </section>
+
+    <section class="account-panel" id="profile" role="tabpanel" hidden>
+      <div class="page-heading">
+        <p class="eyebrow">MY ACCOUNT / PROFILE</p>
+        <h1>Your details.</h1>
+        <p>Keep your contact information up to date for property and inspection enquiries.</p>
+      </div>
+      <form class="profile-form" id="profileForm">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="fullName">Full name <span>*</span></label>
+            <input id="fullName" name="fullName" type="text" autocomplete="name" placeholder="Enter your full name"
+              required>
+          </div>
+          <div class="form-field">
+            <label for="email">Email address <span>*</span></label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="Enter your email address"
+              required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="phone">Phone number <span>*</span></label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="For example, +234 809 000 0000"
+            required>
+          <small>Include your country code so our Lagos office can reach you.</small>
+        </div>
+        <p class="form-note">Your profile information is securely managed through your Heartstone account.</p>
+        <div class="form-actions">
+          <button class="button button--primary" type="submit">Save details <span aria-hidden="true">→</span></button>
+          <p class="form-status" id="profileStatus" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <dialog class="detail-dialog" id="requestDialog" aria-labelledby="dialogTitle">
+    <form method="dialog" class="dialog-close-form"><button class="dialog-close" aria-label="Close details">×</button>
+    </form>
+    <p class="eyebrow">INSPECTION REQUEST</p>
+    <h2 id="dialogTitle">Request details</h2>
+    <div id="dialogContent"></div>
+    <p class="dialog-note"></p>
+    <div class="hs-dialog__actions dialog-buttons">
+      <button class="button button--outline" type="button" id="cancelRequestButton" hidden>Cancel this request</button>
+      <button class="button button--primary" type="button" id="closeDialog">Close details</button>
+    </div>
+  </dialog>
+
+  <script src="js/heartstone-interface.js"></script>
+  <script src="js/heartstone-user-dashboard.js"></script>
+</body>
+
+</html>

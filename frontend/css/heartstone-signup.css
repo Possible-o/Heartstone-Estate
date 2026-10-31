@@ -1,0 +1,368 @@
+:root {
+    --burgundy: #9d2332;
+    --burgundy-dark: #86121f;
+    --charcoal: #252a26;
+    --text: #292a27;
+    --muted: #77746d;
+    --cream: #f6f4ef;
+    --panel: #ece9e1;
+    --border: #d8d6ce;
+    --white: #ffffff;
+
+    --font-heading: "Lora", Georgia, serif;
+    --font-body: "Inter", Helvetica, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-width: 320px;
+    background: var(--cream);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.signup-layout {
+    display: grid;
+    grid-template-columns: 41.7% 58.3%;
+    align-items: stretch;
+}
+
+
+.signup-intro {
+    padding: 3.5rem 9% 4rem 10.8%;
+    background: var(--panel);
+}
+
+.eyebrow {
+    margin-bottom: 1.65rem;
+    color: var(--burgundy);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.065em;
+    line-height: 1.5;
+}
+
+.signup-intro h1 {
+    max-width: 31rem;
+    margin-bottom: 1.5rem;
+    color: var(--charcoal);
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 3.5vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+}
+
+.intro-description {
+    max-width: 28rem;
+    margin-bottom: 1.65rem;
+
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.7;
+}
+
+.intro-property {
+    width: 100%;
+    margin-bottom: 1.6rem;
+}
+
+.intro-property img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.42 / 1;
+    object-fit: cover;
+    background: #dedbd2;
+}
+
+.intro-property figcaption {
+    margin-top: 1.25rem;
+    color: var(--muted);
+    font-size: 0.6rem;
+    line-height: 1.5;
+    letter-spacing: 0.035em;
+}
+
+.signup-form-panel {
+    padding: 3.5rem 9% 3rem;
+    background: var(--cream);
+}
+
+.signup-form-container {
+    width: 100%;
+    max-width: 38rem;
+    margin: 0 auto;
+}
+
+.signup-form-panel .eyebrow {
+    margin-bottom: 1.4rem;
+}
+
+.signup-form-panel h2 {
+    margin-bottom: 1.1rem;
+
+    color: var(--charcoal);
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 3.2vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1.16;
+    letter-spacing: -0.035em;
+}
+
+.form-intro {
+    margin-bottom: 1.5rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.65;
+}
+
+
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.form-field>label {
+    color: var(--text);
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.form-field>label span {
+    color: var(--burgundy);
+}
+
+.form-field input {
+    display: block;
+    width: 100%;
+    height: 2.75rem;
+    padding: 0 0.8rem;
+
+    border: 1px solid #d8d7d1;
+    border-radius: 0;
+    outline: none;
+
+    background: var(--white);
+    color: var(--text);
+    font-size: 0.75rem;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.form-field input::placeholder {
+    color: #77766f;
+    opacity: 1;
+}
+
+.form-field input:hover {
+    border-color: #bcb8ae;
+}
+
+.form-field input:focus {
+    border-color: var(--burgundy);
+    box-shadow: 0 0 0 2px rgb(157 35 50 / 9%);
+}
+
+.form-field small {
+    color: var(--muted);
+    font-size: 0.6rem;
+    line-height: 1.55;
+}
+
+
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    padding-right: 4rem;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.7rem;
+    transform: translateY(-50%);
+
+    padding: 0.25rem 0;
+    border: none;
+    background: transparent;
+
+    color: var(--burgundy);
+    font-size: 0.65rem;
+    cursor: pointer;
+}
+
+.password-toggle:hover {
+    color: var(--burgundy-dark);
+    text-decoration: underline;
+}
+
+.password-requirements {
+    margin-top: 0.05rem;
+    color: var(--muted);
+    font-size: 0.65rem;
+    line-height: 1.65;
+}
+
+.password-requirements p:first-child {
+    margin-bottom: 0.3rem;
+    color: var(--text);
+}
+
+
+
+.terms {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+
+    margin-top: 0.05rem;
+    color: var(--muted);
+    font-size: 0.65rem;
+    line-height: 1.7;
+    cursor: pointer;
+}
+
+.terms input {
+    width: 0.9rem;
+    height: 0.9rem;
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+
+    accent-color: var(--burgundy);
+    cursor: pointer;
+}
+
+.terms a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 0.15rem;
+}
+
+
+
+.create-account-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.75rem 1rem;
+
+    border: 1px solid var(--burgundy);
+    border-radius: 0;
+
+    background: var(--burgundy);
+    color: var(--white);
+
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.create-account-button:hover {
+    border-color: var(--burgundy-dark);
+    background: var(--burgundy-dark);
+}
+
+.button-arrow {
+    font-size: 1rem;
+    transition: transform 0.25s ease;
+}
+
+.create-account-button:hover .button-arrow {
+    transform: translateX(0.25rem);
+}
+
+.required-note {
+    color: var(--muted);
+    font-size: 0.6rem;
+    line-height: 1.6;
+}
+
+
+
+.existing-account {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    margin-top: 1.65rem;
+    padding-top: 1.4rem;
+
+    border-top: 1px solid var(--border);
+}
+
+.existing-account p {
+    color: var(--text);
+    font-size: 0.7rem;
+}
+
+.existing-account a {
+    flex-shrink: 0;
+    color: var(--burgundy);
+    font-size: 0.7rem;
+
+    text-decoration: underline;
+    text-underline-offset: 0.2rem;
+}
+
+.existing-account a span {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.existing-account a:hover span {
+    transform: translateX(0.25rem);
+}
+
+@media (max-width: 760px){
+    .signup-intro {display: none;}
+    .signin-layout {grid-template-columns: 1fr;}
+    .signin-form-panel {padding: 2.5rem 5%;}
+}

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Properties | Heartstone Lagos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/heartstone-homepage.css">
+    <link rel="stylesheet" href="css/heartstone-shared.css">
+    <link rel="stylesheet" href="css/heartstone-listings.css">
+</head>
+
+<body>
+    <header class="office-strip">
+        <div class="office-info">LAGOS RESIDENTIAL / NIGERIA</div>
+        <div class="office-info">+234 809 000 0000</div>
+    </header>
+
+    <div class="nav">
+        <a class="logo" href="index.html" aria-label="Heartstone Lagos home">
+            <p class="brand">HEARTSTONE</p>
+            <p class="office">LAGOS</p>
+        </a>
+
+        <div class="navlinks">
+            <a href="index.html#home-for-sale">Buy</a>
+            <a href="index.html#homes-for-rent">Rent</a>
+            <a href="about-contact.html#services">Sell & let</a>
+            <a href="about-contact.html#about-contact">About & contact</a>
+            <a href="signin.html">Sign in</a>
+        </div>
+    </div>
+
+
+    <main class="page-shell" id="main">
+        <section class="listing-intro">
+            <p class="section-eyebrow">THE COLLECTION</p>
+            <h1>Find a home in Lagos.</h1>
+            <p class="listing-lede">Search homes for sale and to rent across Ikoyi, Victoria Island and Lekki. Property details are open to everyone. Sign in to save homes and request an inspection.</p>
+        </section>
+
+        <form class="filter-bar" id="filterForm" novalidate>
+            <div class="mode-tabs" role="group" aria-label="Sale or rent">
+                <button class="tab active" type="button" data-mode="all" aria-pressed="true">All homes</button>
+                <button class="tab" type="button" data-mode="sale" aria-pressed="false">For sale</button>
+                <button class="tab" type="button" data-mode="rent" aria-pressed="false">To rent</button>
+            </div>
+            <div class="filter-grid">
+                <div class="field field--wide">
+                    <label for="fQuery">NAME OR LOCATION</label>
+                    <input id="fQuery" type="search" placeholder="For example Ikoyi" autocomplete="off">
+                </div>
+                <div class="field">
+                    <label for="fKind">PROPERTY TYPE</label>
+                    <select id="fKind"></select>
+                </div>
+                <div class="field">
+                    <label for="fMin">MINIMUM PRICE (₦)</label>
+                    <input id="fMin" type="number" inputmode="numeric" min="0" step="1" placeholder="No minimum">
+                </div>
+                <div class="field">
+                    <label for="fMax">MAXIMUM PRICE (₦)</label>
+                    <input id="fMax" type="number" inputmode="numeric" min="0" step="1" placeholder="No maximum">
+                </div>
+                <div class="field">
+                    <label for="fBeds">BEDROOMS</label>
+                    <select id="fBeds">
+                        <option value="">Any</option>
+                        <option value="1">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4+</option>
+                    </select>
+                </div>
+                <button class="filter-reset" type="button" id="resetFilters">Reset all filters</button>
+            </div>
+            <p class="filter-error" id="filterError" role="alert" hidden></p>
+        </form>
+
+        <div class="results-bar">
+            <p id="resultCount" role="status" aria-live="polite"></p>
+            <p class="results-note">Prices for rent are per year.</p>
+        </div>
+
+        <div class="property-grid listing-grid" id="resultsGrid"></div>
+
+        <section class="empty-card" id="emptyState" hidden>
+            <p class="section-eyebrow">SEARCH / EMPTY RESULTS</p>
+            <h2>No homes match your search.</h2>
+            <p id="emptySummary" class="empty-summary"></p>
+            <p class="empty-hint">Try a wider price range or remove a filter.</p>
+            <div class="empty-actions">
+                <button class="hs-btn hs-btn--primary" type="button" id="emptyReset">Reset all filters <span aria-hidden="true">→</span></button>
+                <a class="empty-link" href="about-contact.html#enquiry">Contact the office →</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="heartstone-footer">
+
+        <div class="heartstone-footer__main">
+            <div class="heartstone-footer__brand">
+
+                <h2>
+                    A local address.
+                    A wider <br> perspective.
+                </h2>
+
+                <p class="heartstone-footer__description">
+                    12 Admiralty Way, Lekki Phase 1, Lagos State, Nigeria.
+                </p>
+
+                <a href="tel:+2348000000000" class="heartstone-footer__phone">
+                    +234 800 000 0000
+                </a>
+
+            </div>
+
+            <div class="heartstone-footer__navigation">
+
+                <div class="heartstone-footer__column">
+
+                    <p class="heartstone-footer__heading">
+                        EXPLORE
+                    </p>
+
+                    <a href="properties.html?mode=sale">
+                        Properties for sale
+                    </a>
+
+                    <a href="properties.html?mode=rent">
+                        Properties to rent
+                    </a>
+
+                    <a href="user-dashboard.html#saved">
+                        Saved properties
+                    </a>
+
+                </div>
+
+                <div class="heartstone-footer__column">
+
+                    <p class="heartstone-footer__heading">
+                        SERVICES
+                    </p>
+
+                    <a href="about-contact.html#services">
+                        Selling & letting
+                    </a>
+
+                    <a href="about-contact.html?interest=Property%20valuation#enquiry">
+                        Property valuation
+                    </a>
+
+                    <a href="about-contact.html#enquiry">
+                        About & contact
+                    </a>
+                </div>
+
+
+                <div class="heartstone-footer__column">
+
+                    <p class="heartstone-footer__heading">
+                        HEARTSTONE LAGOS
+                    </p>
+
+                    <a href="about-contact.html#services">
+                        Selling & letting
+                    </a>
+
+                    <a href="about-contact.html?interest=Property%20valuation#enquiry">
+                        Request a valuation
+                    </a>
+
+                    <a href="about-contact.html#enquiry">
+                        About & contact
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="heartstone-footer__bottom">
+
+            <p>
+                © 2026 Heartstone Lagos. All rights reserved.
+            </p>
+
+            <p>
+                Real estate in Lagos, Nigeria.
+            </p>
+
+        </div>
+    </footer>
+
+    <script src="js/heartstone-data.js"></script>
+    <script src="js/heartstone-interface.js"></script>
+    <script src="js/heartstone-property-cards.js"></script>
+    <script src="js/heartstone-property-search.js"></script>
+</body>
+
+</html>
