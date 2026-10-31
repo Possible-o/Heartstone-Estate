@@ -1129,3 +1129,7 @@
     font-size: 2rem;
   }
 }
+html,
+body {
+    background-color: #F6F4EF;
+}

@@ -19,8 +19,9 @@ const passwordResetLimiter = rateLimit({
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: {
-    message: "Too many password reset attempts. Please try again in 15 minutes."
-  }
+    message:
+      "Too many password reset attempts. Please try again in 15 minutes.",
+  },
 });
 const User = require("./models/User");
 const Admin = require("./models/Admin");
@@ -155,37 +156,36 @@ app.post("/api/auth/activity", async (req, res) => {
     return res.status(401).json({ authenticated: false });
   }
 
-  
-if (req.session.role === "user") {
-  try {
-    const user = await User.findById(req.session.userId);
+  if (req.session.role === "user") {
+    try {
+      const user = await User.findById(req.session.userId);
 
-    if (
-      !user ||
-      user.role !== "user" ||
-      req.session.sessionVersion !== (user.sessionVersion ?? 0)
-    ) {
-      return req.session.destroy((err) => {
-        if (err) return res.status(500).json({
-          message: "Could not end session."
+      if (
+        !user ||
+        user.role !== "user" ||
+        req.session.sessionVersion !== (user.sessionVersion ?? 0)
+      ) {
+        return req.session.destroy((err) => {
+          if (err)
+            return res.status(500).json({
+              message: "Could not end session.",
+            });
+
+          res.clearCookie("heartstone.sid", { path: "/" });
+
+          return res.status(401).json({
+            authenticated: false,
+            code: "SESSION_INVALIDATED",
+            message: "Your session has expired. Please sign in again.",
+          });
         });
-
-        res.clearCookie("heartstone.sid", { path: "/" });
-
-        return res.status(401).json({
-          authenticated: false,
-          code: "SESSION_INVALIDATED",
-          message: "Your session has expired. Please sign in again."
-        });
+      }
+    } catch (error) {
+      return res.status(500).json({
+        message: "Could not verify session.",
       });
     }
-  } catch (error) {
-    return res.status(500).json({
-      message: "Could not verify session."
-    });
   }
-}
-
 
   req.session.lastActivityAt = Date.now();
   res.set("Cache-Control", "no-store");
@@ -271,7 +271,7 @@ app.delete(
       });
     }
 
-    if (typeof imageUrl !== "string") {
+    if (typeof imageUrl !== "string" || !imageUrl.trim()) {
       return res.status(400).json({
         message: "A valid image URL is required.",
       });
@@ -291,15 +291,11 @@ app.delete(
       });
     }
 
-    const prefix = "/uploads/properties/";
-    const filename = imageUrl.slice(prefix.length);
+    const publicId = getCloudinaryPublicId(imageUrl);
 
-    if (
-      !imageUrl.startsWith(prefix) ||
-      !/^[a-f0-9-]{36}\.(jpg|png|webp)$/.test(filename)
-    ) {
+    if (!publicId && !imageUrl.startsWith("/uploads/properties/")) {
       return res.status(400).json({
-        message: "Invalid uploaded image path.",
+        message: "Invalid property image URL.",
       });
     }
 
@@ -315,17 +311,22 @@ app.delete(
       });
     }
 
-    const filePath = path.join(uploadsDirectory, filename);
+    if (publicId) {
+      try {
+        const result = await cloudinary.uploader.destroy(publicId, {
+          resource_type: "image",
+          invalidate: true,
+        });
 
-    try {
-      await fs.promises.unlink(filePath);
-    } catch (error) {
-      if (error.code !== "ENOENT") {
-        console.error("Picture file cleanup failed:", error);
+        if (!["ok", "not found"].includes(result.result)) {
+          console.error("Cloudinary image deletion:", result);
+        }
+      } catch (error) {
+        console.error("Cloudinary image deletion failed:", error);
       }
     }
 
-    res.json({
+    return res.json({
       message: "Picture removed successfully.",
       property: updated,
     });
@@ -568,18 +569,18 @@ app.get(
       return res.redirect(
         role === "admin" ? "/admin-login.html" : "/signin.html?reason=required",
       );
-      if (
-  role === "user" &&
-  req.session.sessionVersion !== (user.sessionVersion ?? 0)
-) {
-  return req.session.destroy((err) => {
-    if (err) return res.status(500).send("Could not end session.");
+    if (
+      role === "user" &&
+      req.session.sessionVersion !== (user.sessionVersion ?? 0)
+    ) {
+      return req.session.destroy((err) => {
+        if (err) return res.status(500).send("Could not end session.");
 
-    res.clearCookie("heartstone.sid", { path: "/" });
+        res.clearCookie("heartstone.sid", { path: "/" });
 
-    return res.redirect("/signin.html?reason=required");
-  });
-}
+        return res.redirect("/signin.html?reason=required");
+      });
+    }
     const fs = require("fs");
     const html = fs.readFileSync(path.join(frontend, req.path), "utf8");
     const safe = JSON.stringify({ user: publicUser(user) }).replace(
@@ -662,62 +663,15 @@ async function requireUser(req, res, next) {
   }
 }
 
-const uploadsDirectory = path.join(__dirname, "uploads", "properties");
-
-async function cleanupPropertyImages(images) {
-  const prefix = "/uploads/properties/";
-  const validFilename = /^[a-f0-9-]{36}\.(jpg|png|webp)$/;
-
-  for (const imageUrl of images) {
-    if (typeof imageUrl !== "string") continue;
-    if (!imageUrl.startsWith(prefix)) continue;
-
-    const filename = imageUrl.slice(prefix.length);
-
-    if (!validFilename.test(filename)) {
-      console.warn("Skipped invalid image path:", imageUrl);
-      continue;
-    }
-
-    const filePath = path.join(uploadsDirectory, filename);
-
-    try {
-      await fs.promises.unlink(filePath);
-    } catch (error) {
-      if (error.code !== "ENOENT") {
-        console.error("Unable to delete property image:", filename, error);
-      }
-    }
-  }
-}
-
-fs.mkdirSync(uploadsDirectory, { recursive: true });
-
-const imageStorage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, uploadsDirectory);
-  },
-
-  filename: (req, file, callback) => {
-    const extension = {
-      "image/jpeg": ".jpg",
-      "image/png": ".png",
-      "image/webp": ".webp",
-    }[file.mimetype];
-
-    callback(null, crypto.randomUUID() + extension);
-  },
-});
+const cloudinary = require("./cloudinary");
 
 const uploadPropertyImages = multer({
-  storage: imageStorage,
-
+  storage: multer.memoryStorage(),
   limits: {
-    fileSize: 100 * 1024 * 1024,
+    fileSize: 10 * 1024 * 1024,
     files: 8,
     fields: 0,
   },
-
   fileFilter: (req, file, callback) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
@@ -732,24 +686,13 @@ const uploadPropertyImages = multer({
 const validatePropertyImages = async (files) => {
   const allowedFormats = new Set(["jpeg", "png", "webp"]);
 
-  const invalidImage = (message) => {
-    const error = new Error(message);
-    error.code = "INVALID_PROPERTY_IMAGE";
-    return error;
-  };
-
   for (const file of files) {
     let metadata;
-    let verifiedImage;
 
     try {
-      metadata = await sharp(file.path, {
+      metadata = await sharp(file.buffer, {
         limitInputPixels: 40000000,
       }).metadata();
-
-      if (!allowedFormats.has(metadata.format)) {
-        throw invalidImage("Only valid JPG, PNG and WebP images are allowed.");
-      }
 
       const expectedFormat = {
         "image/jpeg": "jpeg",
@@ -757,57 +700,96 @@ const validatePropertyImages = async (files) => {
         "image/webp": "webp",
       }[file.mimetype];
 
-      if (metadata.format !== expectedFormat) {
-        throw invalidImage("Image content does not match its file type.");
+      if (
+        !allowedFormats.has(metadata.format) ||
+        metadata.format !== expectedFormat
+      ) {
+        throw new Error("Image content does not match its file type.");
       }
 
-      verifiedImage = await sharp(file.path, {
+      file.processedBuffer = await sharp(file.buffer, {
         limitInputPixels: 40000000,
       })
         .rotate()
+        .resize({
+          width: 2400,
+          height: 2400,
+          fit: "inside",
+          withoutEnlargement: true,
+        })
         .toFormat(metadata.format)
         .toBuffer();
+
+      file.buffer = undefined;
     } catch (error) {
-      if (error.code === "INVALID_PROPERTY_IMAGE") {
-        throw error;
-      }
-
-      if (error instanceof Error && error.message) {
-        throw invalidImage("The uploaded file is not a valid supported image.");
-      }
-
-      throw error;
+      const invalidImage = new Error(
+        "The uploaded file is not a valid supported image.",
+      );
+      invalidImage.code = "INVALID_PROPERTY_IMAGE";
+      throw invalidImage;
     }
+  }
+};
 
-    if (verifiedImage.length > 100 * 1024 * 1024) {
-      throw invalidImage("Processed images must not exceed 100 MB.");
-    }
+const getCloudinaryPublicId = (imageUrl) => {
+  if (typeof imageUrl !== "string") return null;
 
-    const extension =
-      metadata.format === "jpeg" ? ".jpg" : `.${metadata.format}`;
-    const processedFilename = `${require("crypto").randomUUID()}${extension}`;
-    const processedPath = require("path").join(
-      require("path").dirname(file.path),
-      processedFilename,
+  try {
+    const url = new URL(imageUrl);
+
+    if (url.protocol !== "https:") return null;
+    if (url.hostname !== "res.cloudinary.com") return null;
+
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const prefix = `/${cloudName}/image/upload/`;
+
+    if (!url.pathname.startsWith(prefix)) return null;
+
+    const remainder = url.pathname.slice(prefix.length);
+    const match = remainder.match(
+      /^v\d+\/(heartstone\/properties\/[a-f0-9-]{36})\.(jpg|jpeg|png|webp)$/,
     );
 
-    const originalPath = file.path;
-    file.originalUploadPath = originalPath;
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+};
+
+const uploadToCloudinary = (buffer) =>
+  new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "heartstone/properties",
+        public_id: crypto.randomUUID(),
+        resource_type: "image",
+        overwrite: false,
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        if (!result?.secure_url || !result?.public_id) {
+          return reject(new Error("Cloudinary returned an invalid response."));
+        }
+        resolve(result);
+      },
+    );
+
+    stream.on("error", reject);
+    stream.end(buffer);
+  });
+
+const cleanupPropertyImages = async (images) => {
+  for (const imageUrl of images) {
+    const publicId = getCloudinaryPublicId(imageUrl);
+    if (!publicId) continue;
 
     try {
-      await fs.promises.writeFile(processedPath, verifiedImage, {
-        flag: "wx",
-      });
-
-      file.path = processedPath;
-      file.filename = processedFilename;
-
-      await fs.promises.unlink(originalPath).catch((error) => {
-        console.warn("Original upload cleanup failed:", error.message);
+      await cloudinary.uploader.destroy(publicId, {
+        resource_type: "image",
+        invalidate: true,
       });
     } catch (error) {
-      await fs.promises.unlink(processedPath).catch(() => {});
-      throw error;
+      console.error("Cloudinary image cleanup failed:", error);
     }
   }
 };
@@ -833,82 +815,113 @@ app.post(
     }
 
     uploadPropertyImages.array("images", 8)(req, res, async (error) => {
-      const uploadedFiles = req.files || [];
-
-      const removeUploadedFiles = async () => {
-        const paths = new Set();
-
-        for (const file of uploadedFiles) {
-          if (file.path) paths.add(file.path);
-          if (file.originalUploadPath) {
-            paths.add(file.originalUploadPath);
-          }
-        }
-
-        await Promise.all(
-          [...paths].map(async (filePath) => {
-            try {
-              await fs.promises.unlink(filePath);
-            } catch (error) {
-              if (error.code !== "ENOENT") {
-                console.error("Image cleanup failed:", error);
-              }
-            }
-          }),
-        );
-      };
-
       if (error) {
-        await removeUploadedFiles();
-
         return res.status(400).json({
           message: error.message || "Image upload failed.",
         });
       }
 
+      const uploadedFiles = req.files || [];
+
+      if (!uploadedFiles.length) {
+        return res.status(400).json({
+          message: "Select at least one picture.",
+        });
+      }
+
+      if (property.images.length + uploadedFiles.length > 8) {
+        return res.status(400).json({
+          message: "A property can have a maximum of 8 pictures.",
+        });
+      }
+
+      const uploadedImages = [];
+
       try {
-        if (!uploadedFiles.length) {
-          return res.status(400).json({
-            message: "Select at least one picture.",
-          });
-        }
-
-        if (property.images.length + uploadedFiles.length > 8) {
-          await removeUploadedFiles();
-
-          return res.status(400).json({
-            message: "A property can have a maximum of 8 pictures.",
-          });
-        }
-
         await validatePropertyImages(uploadedFiles);
 
-        const imageUrls = uploadedFiles.map(
-          (file) => "/uploads/properties/" + file.filename,
+        for (const file of uploadedFiles) {
+          const result = await uploadToCloudinary(file.processedBuffer);
+
+          uploadedImages.push({
+            url: result.secure_url,
+            publicId: result.public_id,
+          });
+
+          file.processedBuffer = undefined;
+        }
+
+        const imageUrls = uploadedImages.map((image) => image.url);
+
+        const updated = await Property.findOneAndUpdate(
+          {
+            _id: id,
+            $expr: {
+              $lte: [{ $size: "$images" }, 8 - imageUrls.length],
+            },
+          },
+          {
+            $push: {
+              images: { $each: imageUrls },
+            },
+          },
+          {
+            new: true,
+            runValidators: true,
+          },
         );
 
-        property.images.push(...imageUrls);
+        if (!updated) {
+          const cleanupResults = await Promise.allSettled(
+            uploadedImages.map((image) =>
+              cloudinary.uploader.destroy(image.publicId, {
+                resource_type: "image",
+                invalidate: true,
+              }),
+            ),
+          );
 
-        await property.save();
+          for (const result of cleanupResults) {
+            if (result.status === "rejected") {
+              console.error("Cloudinary cleanup failed:", result.reason);
+            }
+          }
 
-        res.status(201).json({
-          message: "Pictures uploaded successfully.",
-          property,
-        });
-      } catch (error) {
-        await removeUploadedFiles();
-
-        if (error.code === "INVALID_PROPERTY_IMAGE") {
-          return res.status(400).json({
-            message: error.message,
+          return res.status(409).json({
+            message: "Property changed or image limit exceeded. Please retry.",
           });
         }
 
-        console.error("Image upload failed:", error);
-
-        return res.status(500).json({
-          message: "Unable to save uploaded pictures.",
+        return res.status(201).json({
+          message: "Pictures uploaded successfully.",
+          property: updated,
         });
+      } catch (error) {
+        const cleanupResults = await Promise.allSettled(
+          uploadedImages.map((image) =>
+            cloudinary.uploader.destroy(image.publicId, {
+              resource_type: "image",
+              invalidate: true,
+            }),
+          ),
+        );
+
+        for (const result of cleanupResults) {
+          if (result.status === "rejected") {
+            console.error("Cloudinary cleanup failed:", result.reason);
+          }
+        }
+
+        console.error("Cloudinary image upload failed:", error);
+
+        return res
+          .status(error.code === "INVALID_PROPERTY_IMAGE" ? 400 : 500)
+          .json({
+            message:
+              error.code === "INVALID_PROPERTY_IMAGE"
+                ? error.message
+                : "Unable to upload property pictures.",
+          });
       }
     });
   }),
@@ -1899,18 +1912,6 @@ app.patch(
       message: "Cover image updated successfully.",
       property: updatedProperty,
     });
-  }),
-);
-
-app.use(
-  "/uploads/properties",
-  express.static(uploadsDirectory, {
-    index: false,
-    dotfiles: "deny",
-    setHeaders: (res) => {
-      res.setHeader("X-Content-Type-Options", "nosniff");
-      res.setHeader("Content-Security-Policy", "default-src 'none'; sandbox");
-    },
   }),
 );
 

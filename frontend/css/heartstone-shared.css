@@ -845,3 +845,49 @@ textarea[aria-invalid="true"] {
         border-radius: 0 !important;
     }
 }
+
+html {
+    min-height: 100%;
+    background-color: #F6F4EF;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background-color: #F6F4EF;
+}
+
+@supports (min-height: 100dvh) {
+    body {
+        min-height: 100dvh;
+    }
+}
+
+@media (max-width: 767px) {
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+.office-strip a[href^="tel:"],
+.office-strip a[x-apple-data-detectors],
+.office-strip a[href^="tel:"] *,
+a[x-apple-data-detectors] {
+    color: inherit !important;
+    text-decoration: none !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+}
+
+.office-strip .office-phone,
+.office-strip .office-phone:link,
+.office-strip .office-phone:visited,
+.office-strip .office-phone:hover,
+.office-strip .office-phone:active {
+    color: inherit;
+    text-decoration: none;
+    font: inherit;
+    -webkit-text-fill-color: currentColor;
+}

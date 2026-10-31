@@ -2966,3 +2966,18 @@ dialog::backdrop {
     min-width: 650px;
   }
 }
+
+@media (max-width: 767px) {
+    .toolbar .search {
+        padding: 12px 14px;
+        min-height: 44px;
+        height: auto;
+        box-sizing: border-box;
+    }
+
+    .toolbar .search input {
+        font-size: 16px;
+        min-width: 0;
+        width: 100%;
+    }
+}

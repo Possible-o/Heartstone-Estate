@@ -18,7 +18,9 @@
 <body>
     <header class="office-strip">
         <div class="office-info">LAGOS RESIDENTIAL / NIGERIA</div>
-        <div class="office-info">+234 809 000 0000</div>
+        <div class="office-info">
+            <a href="tel:+2348090000000" class="office-phone">+234 809 000 0000</a>
+        </div>
     </header>
 
     <div class="nav">
@@ -46,17 +48,21 @@
             <div class="inspection-head">
                 <p class="section-eyebrow">REQUEST AN INSPECTION</p>
                 <h2 id="inspectionTitle">Choose a time to view.</h2>
-                <p class="inspection-lede">Your preferred date is a request, not a confirmed viewing. The agent has to agree an appointment with you.</p>
+                <p class="inspection-lede">Your preferred date is a request, not a confirmed viewing. The agent has to
+                    agree an appointment with you.</p>
             </div>
 
             <div class="inspection-body">
                 <div id="inspectionGate" class="gate-card" hidden>
                     <p class="section-eyebrow">SIGNED OUT / INSPECTION GATE</p>
                     <h3>Sign in to request an inspection.</h3>
-                    <p>Property information is always available without an account. An account lets you request an inspection and keep track of it.</p>
-                    <p class="return-note"><strong>Return destination retained</strong> After you sign in, you will come back to this property.</p>
+                    <p>Property information is always available without an account. An account lets you request an
+                        inspection and keep track of it.</p>
+                    <p class="return-note"><strong>Return destination retained</strong> After you sign in, you will come
+                        back to this property.</p>
                     <div class="gate-actions">
-                        <a class="hs-btn hs-btn--primary" id="gateSignIn" href="signin.html">Sign in to continue <span aria-hidden="true">→</span></a>
+                        <a class="hs-btn hs-btn--primary" id="gateSignIn" href="signin.html">Sign in to continue <span
+                                aria-hidden="true">→</span></a>
                         <a class="empty-link" id="gateCreate" href="createaccount.html">Create an account instead →</a>
                         <a class="empty-link" href="properties.html">Continue browsing</a>
                     </div>
@@ -71,22 +77,27 @@
                     </div>
                     <div class="form-field">
                         <label for="reqName">Full name <span>*</span></label>
-                        <input id="reqName" name="name" type="text" autocomplete="name" placeholder="Enter full name" required>
+                        <input id="reqName" name="name" type="text" autocomplete="name" placeholder="Enter full name"
+                            required>
                     </div>
                     <div class="form-field">
                         <label for="reqEmail">Email address <span>*</span></label>
-                        <input id="reqEmail" name="email" type="email" autocomplete="email" placeholder="Enter email address" required>
+                        <input id="reqEmail" name="email" type="email" autocomplete="email"
+                            placeholder="Enter email address" required>
                     </div>
                     <div class="form-field">
                         <label for="reqPhone">Phone number <span>*</span></label>
-                        <input id="reqPhone" name="phone" type="tel" autocomplete="tel" placeholder="+234 801 234 5678" required>
+                        <input id="reqPhone" name="phone" type="tel" autocomplete="tel" placeholder="+234 801 234 5678"
+                            required>
                     </div>
                     <div class="form-field">
                         <label for="reqMessage">Message (optional)</label>
-                        <textarea id="reqMessage" name="message" rows="4" maxlength="500" placeholder="Anything the agent should know, such as access or timing"></textarea>
+                        <textarea id="reqMessage" name="message" rows="4" maxlength="500"
+                            placeholder="Anything the agent should know, such as access or timing"></textarea>
                         <small>Please do not include financial or sensitive personal information.</small>
                     </div>
-                    <button class="hs-btn hs-btn--primary" type="submit">Review request <span aria-hidden="true">→</span></button>
+                    <button class="hs-btn hs-btn--primary" type="submit">Review request <span
+                            aria-hidden="true">→</span></button>
                 </form>
 
                 <div id="inspectionReview" class="review-card" hidden>
@@ -95,7 +106,8 @@
                     <div id="reviewContent"></div>
                     <div class="review-actions">
                         <button class="hs-btn hs-btn--ghost" type="button" id="reviewEdit">Edit details</button>
-                        <button class="hs-btn hs-btn--primary" type="button" id="reviewConfirm">Confirm request <span aria-hidden="true">→</span></button>
+                        <button class="hs-btn hs-btn--primary" type="button" id="reviewConfirm">Confirm request <span
+                                aria-hidden="true">→</span></button>
                     </div>
                 </div>
 
@@ -104,7 +116,8 @@
                     <h3>Your inspection request is saved.</h3>
                     <div id="doneContent"></div>
                     <div class="review-actions">
-                        <a class="hs-btn hs-btn--primary" href="user-dashboard.html#inspections">View my inspection requests <span aria-hidden="true">→</span></a>
+                        <a class="hs-btn hs-btn--primary" href="user-dashboard.html#inspections">View my inspection
+                            requests <span aria-hidden="true">→</span></a>
                         <a class="empty-link" href="properties.html">Keep browsing homes</a>
                     </div>
                 </div>
