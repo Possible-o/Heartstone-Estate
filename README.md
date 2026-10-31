@@ -1,105 +1,82 @@
-# Heartstone Estate
+Heartstone Estate
 
-**A full-stack real estate platform for residential property discovery and management in Lagos, Nigeria.**
+Heartstone Estate is a full-stack real estate website built around residential properties in Lagos, Nigeria. It allows visitors to explore available homes, view property details, create accounts, save properties, and request inspections.
 
-Heartstone Estate is a web application built to provide a structured experience for exploring residential properties, managing listings, and coordinating property inspection requests.
+The project also includes an admin dashboard for managing property listings, uploaded images, inspection requests, and customer enquiries.
 
-The platform combines a responsive frontend with a Node.js backend, MongoDB persistence, session-based authentication, and separate administrative access.
+I built the frontend with HTML, CSS, and vanilla JavaScript, while Node.js and Express handle the backend. MongoDB stores the application's data.
 
-## Overview
+Tech Stack
 
-Heartstone Estate addresses two aspects of residential property management: helping prospective clients discover suitable properties and providing administrators with tools to manage listings and customer interactions.
+Frontend: HTML, CSS, JavaScript
 
-The application supports property browsing, account management, saved properties, inspection requests, and administrative operations through dedicated user interfaces.
+Backend: Node.js, Express.js
 
-The system is built with an emphasis on maintainability, clear separation of responsibilities, server-side validation, and secure authentication practices.
+Database: MongoDB, Mongoose
 
-## Technology Stack
+Other tools: bcryptjs, express-session, connect-mongo, Helmet, Nodemailer, Multer, Sharp
 
-| Layer | Technologies |
-|---|---|
-| Frontend | HTML5, CSS3, JavaScript |
-| Backend | Node.js, Express.js |
-| Database | MongoDB, Mongoose |
-| Authentication | Express Session, Connect Mongo, bcryptjs |
-| Security | Helmet, Express Rate Limit, server-side validation |
-| Email | Nodemailer, Gmail SMTP |
-| Image Processing | Multer, Sharp |
-| Version Control | Git, GitHub |
-| Deployment Target | Render |
+Features
 
-## Core Features
+Property Listings
 
-### Property Discovery
+Users can browse properties, search for available homes, and open individual listings to see more information.
 
-- Browse residential properties available for sale or rent.
-- Explore individual property listings and detailed information.
-- Search and filter available properties.
-- Navigate property information through a responsive interface.
+Property information is managed through the admin dashboard, so changes to listings are reflected on the website.
 
-### User Accounts
+User Accounts
 
-- Account registration and authentication.
-- Personalized user dashboard.
-- Favourite property management.
-- Property inspection requests.
-- Password recovery through email verification links.
-- Session-based access to protected functionality.
+Users can register, sign in, manage their favourite properties, and request inspections.
 
-### Administrative Management
+Authentication is handled on the server using Express sessions, with session data stored in MongoDB.
 
-- Dedicated administrator authentication.
-- Property listing creation, modification, and deletion.
-- Multiple-image property uploads.
-- Inspection request management.
-- Customer enquiry management.
-- Restricted access to administrative functionality.
+Admin Dashboard
 
-## Authentication and Security
+Administrators can:
 
-Heartstone Estate implements server-side authentication using Express sessions, with session data stored in MongoDB.
+Add, edit, and delete property listings.
 
-**Authentication architecture**
+Upload multiple images for a property.
 
-Regular users and administrators are maintained in separate MongoDB collections and authenticated through their respective models.
+View and manage inspection requests.
 
-Administrator accounts are created through a restricted backend script rather than a publicly accessible registration interface.
+Manage customer enquiries.
 
-**Password protection**
+Admin accounts are stored separately from regular user accounts. New administrators are created through a backend script rather than a public registration form.
 
-Passwords are hashed using bcryptjs before storage. Authentication compares submitted credentials against stored password hashes rather than retaining plaintext passwords.
+Password Reset
 
-**Password recovery**
+Users who forget their passwords can request a reset link by email.
 
-The password-reset workflow uses cryptographically generated tokens with a 15-minute expiration period. Tokens are stored as hashes and invalidated after successful use.
+The backend generates a random token, stores its hash in MongoDB, and sends the reset link using Nodemailer. Each link expires after 15 minutes and can only be used once.
 
-Password resets also invalidate previously authenticated user sessions through session-version checks.
+Resetting a password also invalidates existing user sessions.
 
-**Additional protections**
+Security
 
-- Server-side input validation.
-- Request rate limiting.
-- HTTP security headers through Helmet.
-- HTTP-only session cookies.
-- Role-based access restrictions.
-- Environment-based secret management.
-- Session regeneration during authentication.
+A few measures I've implemented include:
 
-These controls provide multiple layers of protection, although security remains an ongoing process requiring testing, maintenance, and configuration reviews.
+Password hashing with bcryptjs.
 
-## Application Architecture
+Server-side input validation.
 
-The project separates the presentation layer, backend application logic, and database models.
+Role-based access control for protected routes.
 
-```text
+HTTP-only session cookies.
+
+Session regeneration after login.
+
+Rate limiting on sensitive endpoints.
+
+Security headers using Helmet.
+
+Environment variables for database credentials and other secrets.
+
+Project Structure
+
 Heartstone_Estate/
 ├── backend/
 │   ├── models/
-│   │   ├── Admin.js
-│   │   ├── User.js
-│   │   ├── Property.js
-│   │   ├── InspectionRequest.js
-│   │   └── Enquiry.js
 │   ├── scripts/
 │   │   └── create-admin.js
 │   ├── heartstone-mailer.js
@@ -110,147 +87,65 @@ Heartstone_Estate/
 │   ├── css/
 │   ├── images/
 │   ├── js/
-│   ├── index.html
-│   ├── signin.html
-│   ├── createaccount.html
-│   ├── properties.html
-│   ├── property.html
-│   ├── user-dashboard.html
-│   ├── admin-login.html
-│   └── admin.html
+│   └── index.html
 ├── .gitignore
 └── README.md
-```
 
-### Backend
+The backend contains the Express server, database models, authentication logic, and API endpoints.
 
-The Express application handles HTTP requests, authentication, session management, validation, database operations, and administrative functionality.
+The frontend contains the website pages, stylesheets, images, and JavaScript files.
 
-Mongoose models define the structure of application data and provide the interface for MongoDB operations.
+Running Locally
 
-### Frontend
-
-The frontend uses HTML, CSS, and JavaScript without a frontend framework. JavaScript modules handle interface interactions, form submissions, property presentation, and communication with backend endpoints.
-
-### Database
-
-MongoDB stores application data, including user accounts, administrator accounts, property records, inspection requests, and enquiries.
-
-Session persistence is managed separately using Connect Mongo.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 22.x
-- npm
-- MongoDB Atlas or another compatible MongoDB instance
-- SMTP credentials for password-reset functionality
-
-### Installation
+You'll need Node.js 22.x, npm, and a MongoDB connection.
 
 Clone the repository:
 
-```bash
 git clone https://github.com/Possible-o/Heartstone-Estate
-```
+cd Heartstone_Estate/backend
 
-Install dependencies:
+Install the dependencies:
 
-```bash
 npm install
-```
 
-Create a `.env` file inside the `backend` directory and configure the required environment variables.
+Create a .env file in the backend directory and provide the required configuration:
 
-Start the development server:
+MONGODB_URI=
+SESSION_SECRET=
+SMTP_USER=
+SMTP_APP_PASSWORD=
+APP_BASE_URL=http://localhost:3000
+PORT=3000
+NODE_ENV=development
 
-```bash
-npm run dev
-```
+Start the server:
 
-Alternatively, start the application normally:
-
-```bash
 npm start
-```
 
-Open the application at:
+The application should be available at:
 
-`http://localhost:3000`
+http://localhost:3000
 
-## Environment Variables
+The .env file is excluded from Git, so credentials aren't included in the repository.
 
-The backend uses environment variables to separate configuration and credentials from source code.
+Creating an Admin Account
 
-| Variable | Purpose |
-|---|---|
-| `MONGODB_URI` | MongoDB connection string |
-| `SESSION_SECRET` | Secret used for session signing |
-| `SMTP_USER` | Email account used for password-reset messages |
-| `SMTP_APP_PASSWORD` | SMTP authentication credential |
-| `APP_BASE_URL` | Base URL used when generating password-reset links |
-| `PORT` | HTTP server port |
-| `NODE_ENV` | Application environment |
+Admin accounts are created from the backend terminal:
 
-Actual environment files and credentials are excluded from version control.
-
-## Administrator Provisioning
-
-Administrators are created using a dedicated command:
-
-```bash
 npm run create-admin
-```
 
-The script prompts for administrator details, validates password requirements, hashes the password, and stores the account in the dedicated `admins` collection.
+The script asks for an email address, full name, and password. It validates the information and saves the administrator to the separate admins collection.
 
-Administrative registration is not exposed as a public application feature.
+Deployment
 
-## Engineering Considerations
+The application is currently being prepared for deployment on Render, with MongoDB Atlas handling database storage.
 
-### Authentication Boundaries
+Property image uploads currently use local file storage. Persistent cloud storage will be needed to keep uploaded images available reliably after deployment.
 
-The application distinguishes standard user sessions from administrative sessions. Protected routes enforce authentication and authorization on the server rather than relying exclusively on frontend navigation controls.
+About the Project
 
-### Session Lifecycle
+I worked on this project to put together a complete web application rather than just a static website.
 
-Authentication regenerates sessions to reduce session fixation risks. Session-version checks support invalidation of existing user sessions following a password reset.
+The backend was a major part of the work, particularly connecting authentication to MongoDB, separating user and admin access, managing sessions, and implementing password recovery.
 
-### Password Recovery
-
-Password-reset tokens are time-limited, single-use credentials. Storing their hashes instead of raw token values reduces exposure if database records are compromised.
-
-### Data Management
-
-Dedicated Mongoose models separate the application's primary data entities, supporting consistent validation and database access patterns.
-
-### Responsive Design
-
-The interface is designed for desktop and mobile screen sizes, with responsive layouts and navigation.
-
-## Deployment
-
-**Target platform:** Render
-
-**Database:** MongoDB Atlas
-
-Production deployment requires environment configuration, database network access, HTTPS-aware session settings, and persistent storage for uploaded property images.
-
-The deployment URL will be added after the application is published and verified.
-
-## Project Status
-
-The application has been developed and tested locally. Production deployment and final deployment-specific checks are in progress.
-
-## Future Improvements
-
-- Persistent cloud storage for uploaded property images.
-- Automated integration and regression testing.
-- Expanded property search and filtering capabilities.
-- Application monitoring and structured error reporting.
-- Improved administrative reporting and analytics.
-
-## Author
-
-Developed as a full-stack web development project demonstrating practical experience with frontend engineering, REST-style backend APIs, MongoDB data management, authentication, and administrative workflows.
+The project is still being improved, with deployment and final testing underway.
