@@ -518,19 +518,29 @@
     if (!response.ok) {
       throw new Error(data.message || "Unable to save property.");
     }
+    const savedProperty = normaliseProperty({
+      ...data.property,
+      id: data.property._id,
+    });
 
-    await loadProperties();
+    const existingIndex = propertiesCache.findIndex(
+      (item) => item.id === savedProperty.id,
+    );
+
+    if (existingIndex === -1) {
+      propertiesCache = [...propertiesCache, savedProperty];
+    } else {
+      propertiesCache = propertiesCache.map((item) =>
+        item.id === savedProperty.id ? savedProperty : item,
+      );
+    }
 
     return {
       ok: true,
       created: !editing,
-      property: normaliseProperty({
-        ...data.property,
-        id: data.property._id,
-      }),
+      property: savedProperty,
     };
   }
-
   async function uploadPropertyImages(propertyId, files) {
     if (!propertyId) {
       throw new Error("Property ID is missing.");
@@ -561,14 +571,26 @@
       throw new Error(data.message || "Picture upload failed.");
     }
 
-    await loadProperties();
+    const updatedProperty = normaliseProperty({
+      ...data.property,
+      id: data.property._id,
+    });
+
+    const existingIndex = propertiesCache.findIndex(
+      (item) => item.id === updatedProperty.id,
+    );
+
+    if (existingIndex === -1) {
+      propertiesCache = [...propertiesCache, updatedProperty];
+    } else {
+      propertiesCache = propertiesCache.map((item) =>
+        item.id === updatedProperty.id ? updatedProperty : item,
+      );
+    }
 
     return {
       ok: true,
-      property: normaliseProperty({
-        ...data.property,
-        id: data.property._id,
-      }),
+      property: updatedProperty,
     };
   }
 
@@ -590,16 +612,27 @@
     if (!response.ok) {
       throw new Error(data.message || "Unable to remove picture.");
     }
+    const updatedProperty = normaliseProperty({
+  ...data.property,
+  id: data.property._id,
+});
 
-    await loadProperties();
+const existingIndex = propertiesCache.findIndex(
+  (item) => item.id === updatedProperty.id
+);
 
-    return {
-      ok: true,
-      property: normaliseProperty({
-        ...data.property,
-        id: data.property._id,
-      }),
-    };
+if (existingIndex === -1) {
+  propertiesCache = [...propertiesCache, updatedProperty];
+} else {
+  propertiesCache = propertiesCache.map((item) =>
+    item.id === updatedProperty.id ? updatedProperty : item
+  );
+}
+
+return {
+  ok: true,
+  property: updatedProperty,
+};
   }
 
   async function setPropertyCover(propertyId, imageUrl) {
@@ -621,14 +654,26 @@
       throw new Error(data.message || "Unable to update cover picture.");
     }
 
-    await loadProperties();
+    const updatedProperty = normaliseProperty({
+      ...data.property,
+      id: data.property._id,
+    });
+
+    const existingIndex = propertiesCache.findIndex(
+      (item) => item.id === updatedProperty.id,
+    );
+
+    if (existingIndex === -1) {
+      propertiesCache = [...propertiesCache, updatedProperty];
+    } else {
+      propertiesCache = propertiesCache.map((item) =>
+        item.id === updatedProperty.id ? updatedProperty : item,
+      );
+    }
 
     return {
       ok: true,
-      property: normaliseProperty({
-        ...data.property,
-        id: data.property._id,
-      }),
+      property: updatedProperty,
     };
   }
 
@@ -651,15 +696,27 @@
       throw new Error(data.message || "Unable to update featured status.");
     }
 
-    await loadProperties();
+    const updatedProperty = normaliseProperty({
+  ...data.property,
+  id: data.property._id,
+});
 
-    return {
-      ok: true,
-      property: normaliseProperty({
-        ...data.property,
-        id: data.property._id,
-      }),
-    };
+const existingIndex = propertiesCache.findIndex(
+  (item) => item.id === updatedProperty.id
+);
+
+if (existingIndex === -1) {
+  propertiesCache = [...propertiesCache, updatedProperty];
+} else {
+  propertiesCache = propertiesCache.map((item) =>
+    item.id === updatedProperty.id ? updatedProperty : item
+  );
+}
+
+return {
+  ok: true,
+  property: updatedProperty,
+};
   }
 
   async function deleteProperty(id) {
@@ -674,7 +731,9 @@
       throw new Error(data.message || "Unable to delete property.");
     }
 
-    await loadProperties();
+    propertiesCache = propertiesCache.filter(
+      (property) => property.id !== String(id),
+    );
 
     return {
       ok: true,
@@ -729,8 +788,10 @@
     if (!response.ok) {
       throw new Error(data.message || "Unable to save property.");
     }
-
-    await loadFavourites();
+    const id = String(propertyId);
+    if (!favouritesCache.includes(id)) {
+      favouritesCache = [...favouritesCache, id];
+    }
     return { ok: true };
   }
 
@@ -748,8 +809,8 @@
     if (!response.ok) {
       throw new Error(data.message || "Unable to remove property.");
     }
-
-    await loadFavourites();
+    const id = String(propertyId);
+    favouritesCache = favouritesCache.filter((savedId) => savedId !== id);
     return { ok: true };
   }
 

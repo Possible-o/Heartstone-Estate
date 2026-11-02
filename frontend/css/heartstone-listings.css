@@ -292,8 +292,14 @@
   text-transform: uppercase;
 }
 
+.pd-meta > div {
+  min-width: 0;
+}
+
 .pd-meta dd {
   font-size: 0.85rem;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .pd-features {

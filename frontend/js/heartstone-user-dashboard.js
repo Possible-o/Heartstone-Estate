@@ -558,8 +558,9 @@ async function loadEnquiries() {
         removeButton.disabled = true;
 
         try {
-          await H.removeFavourite(user.id, id);
-          renderSaved();
+          removeButton.textContent = "Removing...";
+await H.removeFavourite(user.id, id);
+renderSaved();
 
           UI.toast(
             (property ? property.name : "Property") +

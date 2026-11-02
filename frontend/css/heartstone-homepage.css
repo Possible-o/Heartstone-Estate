@@ -475,7 +475,15 @@
   color: #ffffff;
 }
 
+.property-save:not(.is-saved) {
+  background-color: #ffffff;
+  color: #2a2a27;
+}
 
+.property-save.is-saved {
+  background-color: #a3182c;
+  color: #ffffff;
+}
 
 .property-details {
   padding-top: 1.5rem;

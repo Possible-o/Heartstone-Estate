@@ -292,17 +292,22 @@
     processing += 1;
     $("#propertySave").disabled = true;
     message.textContent = "Preparing pictures…";
-    for (const file of accepted) {
-      try {
-        draftImages.push({
-          src: await fileToDataUrl(file),
-          isNew: true,
-          file: file,
-        });
-      } catch (error) {
-        problems.push(file.name + " could not be read as a picture.");
-      }
+    const preparedImages = await Promise.all(
+  accepted.map(async (file) => {
+    try {
+      return {
+        src: await fileToDataUrl(file),
+        isNew: true,
+        file,
+      };
+    } catch (error) {
+      problems.push(file.name + " could not be read as a picture.");
+      return null;
     }
+  })
+);
+
+draftImages.push(...preparedImages.filter(Boolean));
     processing -= 1;
     if (!processing) $("#propertySave").disabled = false;
     renderPreviews();
@@ -1104,25 +1109,31 @@
     });
 
     wire();
-    try {
-      await H.loadProperties();
-      render();
-    } catch (error) {
-      console.error("Property loading failed:", error);
-      UI.toast("Unable to load properties from the server.", {
-        kind: "error",
-      });
-    }
+    await Promise.all([
+      (async () => {
+        try {
+          await H.loadProperties();
+          render();
+        } catch (error) {
+          console.error("Property loading failed:", error);
+          UI.toast("Unable to load properties from the server.", {
+            kind: "error",
+          });
+        }
+      })(),
 
-    try {
-      await H.loadRequests();
-      renderRequests();
-    } catch (error) {
-      console.error("Inspection loading failed:", error);
-      UI.toast(error.message || "Unable to load inspection requests.", {
-        kind: "error",
-      });
-    }
+      (async () => {
+        try {
+          await H.loadRequests();
+          renderRequests();
+        } catch (error) {
+          console.error("Inspection loading failed:", error);
+          UI.toast(error.message || "Unable to load inspection requests.", {
+            kind: "error",
+          });
+        }
+      })(),
+    ]);
   }
 
   if (document.readyState === "loading")
