@@ -1614,26 +1614,28 @@ app.patch(
       });
     }
 
-    const request = await InspectionRequest.findById(id);
+    const request = await InspectionRequest.findOneAndUpdate(
+      { _id: id, status: "pending" },
+      {
+        $set: {
+          status,
+          agreedDate: status === "confirmed" ? agreedDate : null,
+          agreedTime: status === "confirmed" ? agreedTime : null,
+          note: note.trim(),
+        },
+      },
+      { new: true, runValidators: true },
+    );
 
     if (!request) {
-      return res.status(404).json({
-        message: "Inspection request not found.",
+      const existingRequest = await InspectionRequest.exists({ _id: id });
+
+      return res.status(existingRequest ? 409 : 404).json({
+        message: existingRequest
+          ? "This request has already been reviewed."
+          : "Inspection request not found.",
       });
     }
-
-    if (request.status !== "pending") {
-      return res.status(409).json({
-        message: "This request has already been reviewed.",
-      });
-    }
-
-    request.status = status;
-    request.agreedDate = status === "confirmed" ? agreedDate : null;
-    request.agreedTime = status === "confirmed" ? agreedTime : null;
-    request.note = note.trim();
-
-    await request.save();
 
     res.json({
       message:
