@@ -231,7 +231,10 @@ app.post("/api/auth/activity", async (req, res) => {
 
   req.session.lastActivityAt = Date.now();
   res.set("Cache-Control", "no-store");
-  res.json({ ok: true });
+  res.json({
+    ok: true,
+    idleExpiresAt: req.session.lastActivityAt + IDLE_TIMEOUT[req.session.role],
+  });
 });
 
 const emailOK = (s) =>
@@ -585,7 +588,12 @@ app.get(
         });
       });
     }
-    res.json({ authenticated: true, user: publicUser(user) });
+    res.json({
+      authenticated: true,
+      user: publicUser(user),
+      idleExpiresAt:
+        req.session.lastActivityAt + IDLE_TIMEOUT[req.session.role],
+    });
   }),
 );
 app.post("/api/auth/logout", (req, res) => {
@@ -626,10 +634,10 @@ app.get(
     const fs = require("fs");
     const htmlFile = role === "admin" ? "admin.html" : "user-dashboard.html";
     const html = fs.readFileSync(path.join(frontend, htmlFile), "utf8");
-    const safe = JSON.stringify({ user: publicUser(user) }).replace(
-      /</g,
-      "\\u003c",
-    );
+    const safe = JSON.stringify({
+      user: publicUser(user),
+      idleExpiresAt: req.session.lastActivityAt + IDLE_TIMEOUT[role],
+    }).replace(/</g, "\\u003c");
     res
       .set("Cache-Control", "no-store")
       .type("html")
@@ -1035,38 +1043,39 @@ app.post(
 
     if (existing) {
       return res.status(409).json({
-        message: "You already have an active inspection request for this property on that date.",
+        message:
+          "You already have an active inspection request for this property on that date.",
       });
     }
 
     let inspection;
 
-try {
-  inspection = await InspectionRequest.create({
-    user: req.currentUser._id,
-    property: property._id,
-    requester: requester.trim(),
-    email: email.trim().toLowerCase(),
-    phone: phone.trim(),
-    preferredDate,
-    message: message.trim(),
-    status: "pending",
-  });
-} catch (error) {
-  if (
-    error.code === 11000 &&
-    error.keyPattern?.user &&
-    error.keyPattern?.property &&
-    error.keyPattern?.preferredDate
-  ) {
-    return res.status(409).json({
-      message:
-        "You already have an active inspection request for this property on that date.",
-    });
-  }
+    try {
+      inspection = await InspectionRequest.create({
+        user: req.currentUser._id,
+        property: property._id,
+        requester: requester.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+        preferredDate,
+        message: message.trim(),
+        status: "pending",
+      });
+    } catch (error) {
+      if (
+        error.code === 11000 &&
+        error.keyPattern?.user &&
+        error.keyPattern?.property &&
+        error.keyPattern?.preferredDate
+      ) {
+        return res.status(409).json({
+          message:
+            "You already have an active inspection request for this property on that date.",
+        });
+      }
 
-  throw error;
-}
+      throw error;
+    }
 
     return res.status(201).json({
       message: "Inspection request submitted successfully.",
