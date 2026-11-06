@@ -94,3 +94,27 @@ test("Protected admin enquiries API rejects unauthenticated visitors", async () 
 
   assert.equal(response.status, 401);
 });
+
+test("Anonymous profile updates are rejected", async () => {
+  const response = await fetch(`${BASE_URL}/api/users/me`, {
+    method: "PATCH",
+    headers: { Origin: BASE_URL, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fullName: "Example Visitor",
+      email: "visitor@example.com",
+      phone: "08012345678",
+    }),
+  });
+
+  assert.equal(response.status, 401);
+});
+
+test("Anonymous property creation is rejected", async () => {
+  const response = await fetch(`${BASE_URL}/api/properties`, {
+    method: "POST",
+    headers: { Origin: BASE_URL, "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+
+  assert.equal(response.status, 401);
+});
