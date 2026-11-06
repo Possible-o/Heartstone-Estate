@@ -194,39 +194,44 @@ app.use((req, res, next) => {
 });
 
 app.post("/api/auth/activity", async (req, res) => {
-  if (!req.session.userId) {
+  if (
+    !req.session.userId ||
+    !["user", "admin"].includes(req.session.role) ||
+    !mongoose.isValidObjectId(req.session.userId)
+  ) {
     return res.status(401).json({ authenticated: false });
   }
 
-  if (req.session.role === "user") {
-    try {
-      const user = await User.findById(req.session.userId);
+  try {
+    const isUser = req.session.role === "user";
+    const account = await (isUser ? User : Admin).findById(req.session.userId);
 
-      if (
-        !user ||
-        user.role !== "user" ||
-        req.session.sessionVersion !== (user.sessionVersion ?? 0)
-      ) {
-        return req.session.destroy((err) => {
-          if (err)
-            return res.status(500).json({
-              message: "Could not end session.",
-            });
-
-          res.clearCookie("heartstone.sid", { path: "/" });
-
-          return res.status(401).json({
-            authenticated: false,
-            code: "SESSION_INVALIDATED",
-            message: "Your session has expired. Please sign in again.",
+    if (
+      !account ||
+      account.role !== req.session.role ||
+      (isUser &&
+        req.session.sessionVersion !== (account.sessionVersion ?? 0))
+    ) {
+      return req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Could not end session.",
           });
+        }
+
+        res.clearCookie("heartstone.sid", { path: "/" });
+
+        return res.status(401).json({
+          authenticated: false,
+          code: "SESSION_INVALIDATED",
+          message: "Your session has expired. Please sign in again.",
         });
-      }
-    } catch (error) {
-      return res.status(500).json({
-        message: "Could not verify session.",
       });
     }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Could not verify session.",
+    });
   }
 
   req.session.lastActivityAt = Date.now();
@@ -655,6 +660,12 @@ async function requireAdmin(req, res, next) {
     if (!req.session.userId || req.session.role !== "admin") {
       return res.status(401).json({
         message: "Administrator login required.",
+      });
+    }
+
+    if (!mongoose.isValidObjectId(req.session.userId)) {
+      return res.status(401).json({
+        message: "Your session is invalid. Please sign in again.",
       });
     }
 
@@ -1614,26 +1625,28 @@ app.patch(
       });
     }
 
-    const request = await InspectionRequest.findById(id);
+    const request = await InspectionRequest.findOneAndUpdate(
+      { _id: id, status: "pending" },
+      {
+        $set: {
+          status,
+          agreedDate: status === "confirmed" ? agreedDate : null,
+          agreedTime: status === "confirmed" ? agreedTime : null,
+          note: note.trim(),
+        },
+      },
+      { new: true, runValidators: true },
+    );
 
     if (!request) {
-      return res.status(404).json({
-        message: "Inspection request not found.",
+      const existingRequest = await InspectionRequest.exists({ _id: id });
+
+      return res.status(existingRequest ? 409 : 404).json({
+        message: existingRequest
+          ? "This request has already been reviewed."
+          : "Inspection request not found.",
       });
     }
-
-    if (request.status !== "pending") {
-      return res.status(409).json({
-        message: "This request has already been reviewed.",
-      });
-    }
-
-    request.status = status;
-    request.agreedDate = status === "confirmed" ? agreedDate : null;
-    request.agreedTime = status === "confirmed" ? agreedTime : null;
-    request.note = note.trim();
-
-    await request.save();
 
     res.json({
       message:
@@ -1959,7 +1972,7 @@ app.patch(
     const updatedProperty = await Property.findOneAndUpdate(
       {
         _id: id,
-        images: imageUrl,
+        images: property.images,
       },
       {
         $set: {

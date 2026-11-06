@@ -1,7 +1,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = (process.env.HEARTSTONE_TEST_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
 
 test("Unauthenticated visitors cannot access the admin dashboard", async () => {
   const response = await fetch(`${BASE_URL}/admin`, {
@@ -72,4 +72,99 @@ test("Unauthenticated visitors cannot refresh session activity", async () => {
   });
 
   assert.equal(response.status, 401);
+});
+
+test("User dashboard HTML requires authentication", async () => {
+  const response = await fetch(`${BASE_URL}/user-dashboard`, {
+    redirect: "manual",
+  });
+
+  assert.equal(response.status, 302);
+  assert.match(response.headers.get("location") || "", /signin/);
+});
+
+test("Protected user API rejects unauthenticated visitors", async () => {
+  const response = await fetch(`${BASE_URL}/api/inspections/mine`);
+
+  assert.equal(response.status, 401);
+});
+
+test("Protected admin enquiries API rejects unauthenticated visitors", async () => {
+  const response = await fetch(`${BASE_URL}/api/admin/enquiries`);
+
+  assert.equal(response.status, 401);
+});
+
+test("Anonymous profile updates are rejected", async () => {
+  const response = await fetch(`${BASE_URL}/api/users/me`, {
+    method: "PATCH",
+    headers: { Origin: BASE_URL, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fullName: "Example Visitor",
+      email: "visitor@example.com",
+      phone: "08012345678",
+    }),
+  });
+
+  assert.equal(response.status, 401);
+});
+
+test("Anonymous property creation is rejected", async () => {
+  const response = await fetch(`${BASE_URL}/api/properties`, {
+    method: "POST",
+    headers: { Origin: BASE_URL, "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+
+  assert.equal(response.status, 401);
+});
+
+test("Anonymous property image uploads are rejected", async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/properties/507f1f77bcf86cd799439011/images`,
+    {
+      method: "POST",
+      headers: { Origin: BASE_URL },
+    },
+  );
+
+  assert.equal(response.status, 401);
+});
+
+test("Anonymous property image deletion is rejected", async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/properties/507f1f77bcf86cd799439011/images`,
+    {
+      method: "DELETE",
+      headers: { Origin: BASE_URL, "Content-Type": "application/json" },
+      body: JSON.stringify({ imageUrl: "/uploads/properties/example.jpg" }),
+    },
+  );
+
+  assert.equal(response.status, 401);
+});
+
+test("Anonymous property deletion is rejected", async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/properties/507f1f77bcf86cd799439011`,
+    { method: "DELETE", headers: { Origin: BASE_URL } },
+  );
+
+  assert.equal(response.status, 401);
+});
+
+test("Untrusted origins cannot change property cover images", async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/properties/507f1f77bcf86cd799439011/cover`,
+    {
+      method: "PATCH",
+      headers: {
+        Origin: "https://untrusted.example",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ imageUrl: "/uploads/properties/example.jpg" }),
+    },
+  );
+
+  assert.equal(response.status, 403);
 });
