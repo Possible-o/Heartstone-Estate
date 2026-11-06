@@ -194,19 +194,24 @@ app.use((req, res, next) => {
 });
 
 app.post("/api/auth/activity", async (req, res) => {
-  if (!req.session.userId) {
+  if (
+    !req.session.userId ||
+    !["user", "admin"].includes(req.session.role) ||
+    !mongoose.isValidObjectId(req.session.userId)
+  ) {
     return res.status(401).json({ authenticated: false });
   }
 
-  if (req.session.role === "user") {
-    try {
-      const user = await User.findById(req.session.userId);
+  try {
+    const isUser = req.session.role === "user";
+    const account = await (isUser ? User : Admin).findById(req.session.userId);
 
-      if (
-        !user ||
-        user.role !== "user" ||
-        req.session.sessionVersion !== (user.sessionVersion ?? 0)
-      ) {
+    if (
+      !account ||
+      account.role !== req.session.role ||
+      (isUser &&
+        req.session.sessionVersion !== (account.sessionVersion ?? 0))
+    ) {
         return req.session.destroy((err) => {
           if (err)
             return res.status(500).json({
@@ -221,12 +226,11 @@ app.post("/api/auth/activity", async (req, res) => {
             message: "Your session has expired. Please sign in again.",
           });
         });
-      }
-    } catch (error) {
-      return res.status(500).json({
-        message: "Could not verify session.",
-      });
     }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Could not verify session.",
+    });
   }
 
   req.session.lastActivityAt = Date.now();
