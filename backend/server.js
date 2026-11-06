@@ -1966,7 +1966,7 @@ app.patch(
     const updatedProperty = await Property.findOneAndUpdate(
       {
         _id: id,
-        images: imageUrl,
+        images: property.images,
       },
       {
         $set: {
