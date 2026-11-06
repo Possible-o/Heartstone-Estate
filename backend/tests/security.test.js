@@ -118,3 +118,53 @@ test("Anonymous property creation is rejected", async () => {
 
   assert.equal(response.status, 401);
 });
+
+test("Anonymous property image uploads are rejected", async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/properties/507f1f77bcf86cd799439011/images`,
+    {
+      method: "POST",
+      headers: { Origin: BASE_URL },
+    },
+  );
+
+  assert.equal(response.status, 401);
+});
+
+test("Anonymous property image deletion is rejected", async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/properties/507f1f77bcf86cd799439011/images`,
+    {
+      method: "DELETE",
+      headers: { Origin: BASE_URL, "Content-Type": "application/json" },
+      body: JSON.stringify({ imageUrl: "/uploads/properties/example.jpg" }),
+    },
+  );
+
+  assert.equal(response.status, 401);
+});
+
+test("Anonymous property deletion is rejected", async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/properties/507f1f77bcf86cd799439011`,
+    { method: "DELETE", headers: { Origin: BASE_URL } },
+  );
+
+  assert.equal(response.status, 401);
+});
+
+test("Untrusted origins cannot change property cover images", async () => {
+  const response = await fetch(
+    `${BASE_URL}/api/properties/507f1f77bcf86cd799439011/cover`,
+    {
+      method: "PATCH",
+      headers: {
+        Origin: "https://untrusted.example",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ imageUrl: "/uploads/properties/example.jpg" }),
+    },
+  );
+
+  assert.equal(response.status, 403);
+});
