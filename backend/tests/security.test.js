@@ -1,7 +1,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = (process.env.HEARTSTONE_TEST_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
 
 test("Unauthenticated visitors cannot access the admin dashboard", async () => {
   const response = await fetch(`${BASE_URL}/admin`, {
@@ -70,6 +70,27 @@ test("Unauthenticated visitors cannot refresh session activity", async () => {
       Origin: BASE_URL,
     },
   });
+
+  assert.equal(response.status, 401);
+});
+
+test("User dashboard HTML requires authentication", async () => {
+  const response = await fetch(`${BASE_URL}/user-dashboard`, {
+    redirect: "manual",
+  });
+
+  assert.equal(response.status, 302);
+  assert.match(response.headers.get("location") || "", /signin/);
+});
+
+test("Protected user API rejects unauthenticated visitors", async () => {
+  const response = await fetch(`${BASE_URL}/api/inspections/mine`);
+
+  assert.equal(response.status, 401);
+});
+
+test("Protected admin enquiries API rejects unauthenticated visitors", async () => {
+  const response = await fetch(`${BASE_URL}/api/admin/enquiries`);
 
   assert.equal(response.status, 401);
 });
