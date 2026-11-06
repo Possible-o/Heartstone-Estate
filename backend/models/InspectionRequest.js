@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const inspectionRequestSchema = new mongoose.Schema(
@@ -77,6 +76,17 @@ inspectionRequestSchema.index({
   preferredDate: 1,
   status: 1
 });
+
+inspectionRequestSchema.index(
+  { user: 1, property: 1, preferredDate: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: { $in: ["pending", "confirmed"] },
+    },
+    name: "unique_active_inspection_request",
+  }
+);
 
 module.exports = mongoose.model(
   "InspectionRequest",

@@ -44,8 +44,36 @@ if (
 }
 app.disable("x-powered-by");
 if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
+
 app.use(helmet({ contentSecurityPolicy: false }));
+
+app.use((req, res, next) => {
+  res.locals.cspNonce = crypto.randomBytes(16).toString("base64");
+  next();
+});
+
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      `script-src 'self' 'nonce-${res.locals.cspNonce}'`,
+      "script-src-attr 'none'",
+      "style-src 'self' https://fonts.googleapis.com",
+      "img-src 'self' https://res.cloudinary.com data: blob:",
+      "font-src 'self' https://fonts.gstatic.com",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+    ].join("; "),
+  );
+  next();
+});
+
 app.use(express.json({ limit: "20kb" }));
+
 app.use(
   session({
     name: "heartstone.sid",
@@ -64,13 +92,27 @@ app.use(
     },
   }),
 );
+
 app.use((req, res, next) => {
-  if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
-    const origin = req.get("origin");
-    if (origin && origin !== `${req.protocol}://${req.get("host")}`)
-      return res.status(403).json({ message: "Request origin not allowed." });
+  if (!["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+    return next();
   }
-  next();
+
+  const origin = req.get("origin");
+  const expectedOrigin = `${req.protocol}://${req.get("host")}`;
+
+  if (origin) {
+    if (origin !== expectedOrigin) {
+      return res.status(403).json({
+        message: "Request origin not allowed.",
+      });
+    }
+
+    return next();
+  }
+  return res.status(403).json({
+    message: "A valid Origin header is required.",
+  });
 });
 
 const enquiryLimiter = rateLimit({
@@ -554,9 +596,9 @@ app.post("/api/auth/logout", (req, res) => {
   });
 });
 app.get(
-  ["/user-dashboard.html", "/admin.html"],
+  ["/user-dashboard", "/user-dashboard.html", "/admin", "/admin.html"],
   wrap(async (req, res) => {
-    const role = req.path === "/admin.html" ? "admin" : "user";
+    const role = req.path.toLowerCase().startsWith("/admin") ? "admin" : "user";
     if (!req.session.userId || req.session.role !== role)
       return res.redirect(
         role === "admin"
@@ -582,10 +624,11 @@ app.get(
       });
     }
     const fs = require("fs");
-    const html = fs.readFileSync(path.join(frontend, req.path), "utf8");
+    const htmlFile = role === "admin" ? "admin.html" : "user-dashboard.html";
+    const html = fs.readFileSync(path.join(frontend, htmlFile), "utf8");
     const safe = JSON.stringify({ user: publicUser(user) }).replace(
       /</g,
-      "\u003c",
+      "\\u003c",
     );
     res
       .set("Cache-Control", "no-store")
@@ -593,7 +636,7 @@ app.get(
       .send(
         html.replace(
           /<head([^>]*)>/i,
-          `<head$1><script>window.__HEARTSTONE_SESSION__=${safe};</script>`,
+          `<head$1><script nonce="${res.locals.cspNonce}">window.__HEARTSTONE_SESSION__=${safe};</script>`,
         ),
       );
   }),
@@ -987,26 +1030,43 @@ app.post(
       user: req.currentUser._id,
       property: property._id,
       preferredDate,
-      status: "pending",
+      status: { $in: ["pending", "confirmed"] },
     });
 
     if (existing) {
       return res.status(409).json({
-        message:
-          "You already have a pending inspection request for this property on that date.",
+        message: "You already have an active inspection request for this property on that date.",
       });
     }
 
-    const inspection = await InspectionRequest.create({
-      user: req.currentUser._id,
-      property: property._id,
-      requester: requester.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone.trim(),
-      preferredDate,
-      message: message.trim(),
-      status: "pending",
+    let inspection;
+
+try {
+  inspection = await InspectionRequest.create({
+    user: req.currentUser._id,
+    property: property._id,
+    requester: requester.trim(),
+    email: email.trim().toLowerCase(),
+    phone: phone.trim(),
+    preferredDate,
+    message: message.trim(),
+    status: "pending",
+  });
+} catch (error) {
+  if (
+    error.code === 11000 &&
+    error.keyPattern?.user &&
+    error.keyPattern?.property &&
+    error.keyPattern?.preferredDate
+  ) {
+    return res.status(409).json({
+      message:
+        "You already have an active inspection request for this property on that date.",
     });
+  }
+
+  throw error;
+}
 
     return res.status(201).json({
       message: "Inspection request submitted successfully.",
@@ -1916,15 +1976,34 @@ app.patch(
   }),
 );
 
+app.use((req, res, next) => {
+  const requestedPath = req.path.replace(/\/+$/, "").toLowerCase();
+
+  if (
+    requestedPath === "/admin" ||
+    requestedPath === "/admin.html" ||
+    requestedPath === "/user-dashboard" ||
+    requestedPath === "/user-dashboard.html"
+  ) {
+    return res.status(404).send("Not Found");
+  }
+
+  next();
+});
+
 app.use(
   express.static(frontend, {
     index: "index.html",
     extensions: ["html"],
+    fallthrough: true,
     setHeaders: (res, file) => {
-      if (file.endsWith(".html")) res.setHeader("Cache-Control", "no-store");
+      if (file.endsWith(".html")) {
+        res.setHeader("Cache-Control", "no-store");
+      }
     },
   }),
 );
+
 app.use("/api", (req, res) =>
   res.status(404).json({ message: "Endpoint not implemented." }),
 );
