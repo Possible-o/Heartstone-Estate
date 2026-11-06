@@ -17,6 +17,8 @@ The application also includes a protected administrative dashboard for managing 
 | Security | Helmet, express-rate-limit, server-side validation |
 | Image Management | Cloudinary, Multer, Sharp |
 | Email | Nodemailer |
+| Testing | Node.js built-in test runner |
+| Continuous Integration | GitHub Actions |
 | Deployment | Render |
 
 ## Features
@@ -38,6 +40,7 @@ The application also includes a protected administrative dashboard for managing 
 - Favourite property management.
 - Property inspection requests.
 - Password recovery through email.
+- User profile management.
 
 ### Administrative Dashboard
 
@@ -77,7 +80,9 @@ Heartstone Estate includes several security measures:
 - Separate administrator authentication.
 - Rate limiting on sensitive endpoints.
 - HTTP security headers using Helmet.
-- Protected administrative API routes.
+- Protected user and administrative API routes.
+- Origin validation for state-changing requests.
+- Session validity checks.
 - Environment variables for sensitive configuration.
 
 Authentication and authorisation are enforced by the backend rather than relying solely on frontend restrictions.
@@ -86,10 +91,15 @@ Authentication and authorisation are enforced by the backend rather than relying
 
 ```text
 Heartstone-Estate/
+├── .github/
+│   └── workflows/
+│       └── heartstone-checks.yml
 ├── backend/
 │   ├── models/
 │   ├── scripts/
 │   │   └── create-admin.js
+│   ├── tests/
+│   │   └── security.test.js
 │   ├── heartstone-mailer.js
 │   ├── server.js
 │   ├── package.json
@@ -179,6 +189,45 @@ Follow the prompts to provide the administrator's required information.
 
 The account is stored in the separate administrator collection in MongoDB.
 
+## Testing
+
+Heartstone Estate includes automated security tests using the Node.js built-in test runner.
+
+The test suite contains 16 tests covering authentication restrictions, protected routes, administrative API access, session activity protection, and origin validation.
+
+To run the security tests, first start the backend server with a valid local environment and database connection:
+
+```bash
+npm start
+```
+
+In a separate terminal, navigate to the `backend` directory and run:
+
+```bash
+npm run test:security
+```
+
+By default, the tests target `http://localhost:3000`. The test server address can be overridden using the `HEARTSTONE_TEST_BASE_URL` environment variable.
+
+The security tests verify that unauthenticated visitors cannot access protected resources and that requests from untrusted origins are rejected where applicable.
+
+These tests supplement manual functional testing and do not constitute a complete security audit.
+
+## Continuous Integration
+
+Heartstone Estate uses GitHub Actions for automated code validation.
+
+The workflow:
+
+- Installs backend dependencies using `npm ci`.
+- Uses Node.js 22.
+- Checks backend JavaScript files for syntax errors.
+- Checks frontend JavaScript files for syntax errors.
+
+The workflow runs on pull requests and pushes to the `heartstone-v1-hardening` branch.
+
+The CI workflow performs syntax validation; the security integration tests are run separately against a running backend server.
+
 ## Deployment
 
 Heartstone Estate is deployed on Render with MongoDB Atlas providing database storage and Cloudinary providing persistent image hosting.
@@ -198,8 +247,18 @@ Heartstone Estate was developed to demonstrate the design and implementation of 
 - Property and image management.
 - Inspection request workflows.
 - Email-based password recovery.
+- Automated security testing.
+- Continuous integration and code validation.
 - Cloud deployment and persistent data storage.
 
 ## Project Status
 
-The application has been deployed and includes its core property management, authentication, inspection request, enquiry management, and Cloudinary image-management functionality.
+**Version 1.0 — Completed and Deployed**
+
+Heartstone Estate V1 includes its core property management, authentication, inspection request, enquiry management, and Cloudinary image-management functionality.
+
+The application has undergone local functional testing, automated security checks, and GitHub Actions syntax validation.
+
+The V1 security and reliability improvements have been merged into the main branch and deployed to Render.
+
+Further enhancements and additional test coverage may be introduced in future versions.
