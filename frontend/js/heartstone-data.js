@@ -167,7 +167,11 @@
   const initialSession = global.__HEARTSTONE_SESSION__ || null;
   let activeSession =
     initialSession && initialSession.user
-      ? { valid: true, user: initialSession.user }
+      ? {
+          valid: true,
+          user: initialSession.user,
+          idleExpiresAt: initialSession.idleExpiresAt,
+        }
       : { valid: false };
   async function refreshSession() {
     try {
@@ -185,7 +189,11 @@
 
       activeSession =
         data.authenticated && data.user
-          ? { valid: true, user: data.user }
+          ? {
+              valid: true,
+              user: data.user,
+              idleExpiresAt: data.idleExpiresAt,
+            }
           : { valid: false };
 
       return activeSession;
@@ -613,26 +621,26 @@
       throw new Error(data.message || "Unable to remove picture.");
     }
     const updatedProperty = normaliseProperty({
-  ...data.property,
-  id: data.property._id,
-});
+      ...data.property,
+      id: data.property._id,
+    });
 
-const existingIndex = propertiesCache.findIndex(
-  (item) => item.id === updatedProperty.id
-);
+    const existingIndex = propertiesCache.findIndex(
+      (item) => item.id === updatedProperty.id,
+    );
 
-if (existingIndex === -1) {
-  propertiesCache = [...propertiesCache, updatedProperty];
-} else {
-  propertiesCache = propertiesCache.map((item) =>
-    item.id === updatedProperty.id ? updatedProperty : item
-  );
-}
+    if (existingIndex === -1) {
+      propertiesCache = [...propertiesCache, updatedProperty];
+    } else {
+      propertiesCache = propertiesCache.map((item) =>
+        item.id === updatedProperty.id ? updatedProperty : item,
+      );
+    }
 
-return {
-  ok: true,
-  property: updatedProperty,
-};
+    return {
+      ok: true,
+      property: updatedProperty,
+    };
   }
 
   async function setPropertyCover(propertyId, imageUrl) {
@@ -697,26 +705,26 @@ return {
     }
 
     const updatedProperty = normaliseProperty({
-  ...data.property,
-  id: data.property._id,
-});
+      ...data.property,
+      id: data.property._id,
+    });
 
-const existingIndex = propertiesCache.findIndex(
-  (item) => item.id === updatedProperty.id
-);
+    const existingIndex = propertiesCache.findIndex(
+      (item) => item.id === updatedProperty.id,
+    );
 
-if (existingIndex === -1) {
-  propertiesCache = [...propertiesCache, updatedProperty];
-} else {
-  propertiesCache = propertiesCache.map((item) =>
-    item.id === updatedProperty.id ? updatedProperty : item
-  );
-}
+    if (existingIndex === -1) {
+      propertiesCache = [...propertiesCache, updatedProperty];
+    } else {
+      propertiesCache = propertiesCache.map((item) =>
+        item.id === updatedProperty.id ? updatedProperty : item,
+      );
+    }
 
-return {
-  ok: true,
-  property: updatedProperty,
-};
+    return {
+      ok: true,
+      property: updatedProperty,
+    };
   }
 
   async function deleteProperty(id) {
@@ -939,15 +947,19 @@ return {
     const role = doc.documentElement.getAttribute("data-protected");
 
     if (!["user", "admin"].includes(role)) return;
-
-    const limit = role === "admin" ? 5 * 60 * 1000 : 15 * 60 * 1000;
+    const limit = role === "admin" ? 60 * 1000 : 10 * 60 * 1000;
     const loginPage =
       role === "admin"
         ? "admin-login.html?reason=expired"
         : "signin.html?reason=expired";
 
     const throttle = 30 * 1000;
-    let lastActivity = Date.now();
+    const initialExpiry = activeSession.idleExpiresAt;
+
+    let lastActivity = Number.isFinite(initialExpiry)
+      ? initialExpiry - limit
+      : Date.now();
+
     let lastSent = lastActivity;
     let timer = null;
     let sending = false;
@@ -1002,7 +1014,15 @@ return {
         }
 
         if (response.ok) {
+          const data = await response.json();
+
+          if (Number.isFinite(data.idleExpiresAt)) {
+            activeSession.idleExpiresAt = data.idleExpiresAt;
+            lastActivity = Math.max(lastActivity, data.idleExpiresAt - limit);
+          }
+
           lastSent = Date.now();
+          scheduleCheck();
         }
       } catch (error) {
         console.error("Unable to update session activity:", error);
