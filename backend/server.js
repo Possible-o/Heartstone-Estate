@@ -141,8 +141,8 @@ app.use(
 );
 
 const IDLE_TIMEOUT = {
-  user: 15 * 60 * 1000,
-  admin: 5 * 60 * 1000,
+  admin: 60 * 1000,
+  user: 10 * 60 * 1000,
 };
 
 app.use((req, res, next) => {

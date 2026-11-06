@@ -939,8 +939,7 @@ return {
     const role = doc.documentElement.getAttribute("data-protected");
 
     if (!["user", "admin"].includes(role)) return;
-
-    const limit = role === "admin" ? 5 * 60 * 1000 : 15 * 60 * 1000;
+    const limit = role === "admin" ? 60 * 1000 : 10 * 60 * 1000;
     const loginPage =
       role === "admin"
         ? "admin-login.html?reason=expired"
