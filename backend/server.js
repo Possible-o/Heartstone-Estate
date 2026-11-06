@@ -663,6 +663,12 @@ async function requireAdmin(req, res, next) {
       });
     }
 
+    if (!mongoose.isValidObjectId(req.session.userId)) {
+      return res.status(401).json({
+        message: "Your session is invalid. Please sign in again.",
+      });
+    }
+
     const admin = await Admin.findById(req.session.userId);
 
     if (!admin || admin.role !== "admin") {
