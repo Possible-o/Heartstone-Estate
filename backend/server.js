@@ -212,20 +212,21 @@ app.post("/api/auth/activity", async (req, res) => {
       (isUser &&
         req.session.sessionVersion !== (account.sessionVersion ?? 0))
     ) {
-        return req.session.destroy((err) => {
-          if (err)
-            return res.status(500).json({
-              message: "Could not end session.",
-            });
-
-          res.clearCookie("heartstone.sid", { path: "/" });
-
-          return res.status(401).json({
-            authenticated: false,
-            code: "SESSION_INVALIDATED",
-            message: "Your session has expired. Please sign in again.",
+      return req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Could not end session.",
           });
+        }
+
+        res.clearCookie("heartstone.sid", { path: "/" });
+
+        return res.status(401).json({
+          authenticated: false,
+          code: "SESSION_INVALIDATED",
+          message: "Your session has expired. Please sign in again.",
         });
+      });
     }
   } catch (error) {
     return res.status(500).json({
